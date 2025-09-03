@@ -14,5 +14,5 @@ public class Booking
 
     public DateTime Date { get; set; }       // vilken dag bokningen gäller
     public string UserId { get; set; }
-    // public ApplicationUser User { get; set; }
+    public AppUser User { get; set; }
 }
