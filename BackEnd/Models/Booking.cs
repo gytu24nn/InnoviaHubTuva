@@ -5,4 +5,14 @@ namespace BackEnd.Models;
 public class Booking
 {
     public int Id { get; set; }
+
+    public int ResourceId { get; set; }
+    public Resources Resource { get; set; }
+
+    public int TimeSlotId { get; set; }
+    public TimeSlots TimeSlot { get; set; }
+
+    public DateTime Date { get; set; }       // vilken dag bokningen gäller
+    public string UserId { get; set; }
+    // public ApplicationUser User { get; set; }
 }
