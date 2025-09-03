@@ -1,6 +1,8 @@
 using BackEnd.Data;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,11 @@ builder.Services.AddDbContext<InnoviaHubDbContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
+
+// Konfigurera Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<InnoviaHubDbContext>()
+    .AddDefaultTokenProviders();
 
 
 builder.Services.AddCors(options =>
