@@ -16,6 +16,7 @@ namespace BackEnd.Controllers
             _context = context;
         }
 
+        //available time slots for a resource on a specific date
         [HttpGet("{resourceId}/available-timeslots")]
         public async Task<IActionResult> GetAvailableTimeSlots(int resourceId, [FromQuery] DateTime date)
         {
@@ -29,8 +30,44 @@ namespace BackEnd.Controllers
             var availableSlots = allSlots
                 .Where(slot => !bookedSlotsIds.Contains(slot.TimeSlotsId))
                 .ToList();
-            
+
             return Ok(availableSlots);
+        }
+
+        [HttpGet("available")]
+        public async Task<IActionResult> GetAvailableResources(
+            [FromQuery] DateTime date,
+            [FromQuery] int timeSlotId,
+            [FromQuery] int? typeId = null)
+
+        {
+            var query = _context.Resources.Include(r => r.ResourceType).AsQueryable();
+
+            if (typeId.HasValue)
+            {
+                query = query.Where(r => r.ResourceTypeId == typeId.Value);
+            }
+
+            var allResources = await query.ToListAsync();
+
+            //Hämta resurser som redan är bokade
+            var bookedIds = await _context.Bookings
+                .Where(b => b.Date == date.Date && b.TimeSlotId == timeSlotId)
+                .Select(b => b.ResourceId)
+                .ToListAsync();
+
+            //filtrera ut lediga resurser
+            var availableResource = allResources
+                .Where(r => !bookedIds.Contains(r.ResourcesId))
+                .Select(r => new
+                {
+                    r.ResourcesId,
+                    r.Name,
+                    type = r.ResourceType.Name
+                })
+                .ToList();
+
+            return Ok(availableResource);
         }
 
     }
