@@ -59,8 +59,8 @@ namespace BackEnd.Controllers
                 if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     // Hämta användarens roll
-                    var roleClaim = (await _userManager.GetClaimsAsync(user))
-                                        .FirstOrDefault(c => c.Type == "role")?.Value ?? "user";
+                    var roles = await _userManager.GetRolesAsync(user);
+                    var roleClaim = roles.FirstOrDefault() ?? "user";
 
 
                     var tokenHandler = new JwtSecurityTokenHandler();
@@ -72,7 +72,7 @@ namespace BackEnd.Controllers
                         Audience = "http://localhost:5199",
                         Subject = new ClaimsIdentity(new Claim[] {
                         new Claim(ClaimTypes.Name, user.UserName),
-                        new Claim("role", roleClaim),
+                        new Claim(ClaimTypes.Role, roleClaim),
                         new Claim("userId", user.Id),
                     }),
                         Expires = DateTime.UtcNow.AddHours(1),
