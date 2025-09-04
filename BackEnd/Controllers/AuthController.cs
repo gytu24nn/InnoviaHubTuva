@@ -68,12 +68,12 @@ namespace BackEnd.Controllers
 
                     var tokenDescriptor = new SecurityTokenDescriptor
                     {
-                        Issuer = "http://localhost:5199",
-                        Audience = "http://localhost:5199",
+                        Issuer = "http://localhost:5099",
+                        Audience = "http://localhost:5099",
                         Subject = new ClaimsIdentity(new Claim[] {
                         new Claim(ClaimTypes.Name, user.UserName),
                         new Claim(ClaimTypes.Role, roleClaim),
-                        new Claim("userId", user.Id),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id),
                     }),
                         Expires = DateTime.UtcNow.AddHours(1),
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
