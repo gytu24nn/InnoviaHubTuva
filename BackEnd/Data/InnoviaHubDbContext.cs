@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BackEnd.Data;
 
-public class InnoviaHubDbContext : IdentityDbContext<IdentityUser>
+public class InnoviaHubDbContext : IdentityDbContext<AppUser>
 {
     public InnoviaHubDbContext(DbContextOptions<InnoviaHubDbContext> options) : base(options)
     {
@@ -23,10 +23,10 @@ public class InnoviaHubDbContext : IdentityDbContext<IdentityUser>
         base.OnModelCreating(modelBuilder);
 
         // Skapa en hasher-instans
-        var hasher = new PasswordHasher<IdentityUser>(); 
+        var hasher = new PasswordHasher<AppUser>(); 
 
         // Skapa admin-användaren
-        var adminUser = new IdentityUser
+        var adminUser = new AppUser
         {
             Id = "1", 
             UserName = "admin",
@@ -38,18 +38,8 @@ public class InnoviaHubDbContext : IdentityDbContext<IdentityUser>
         };
         adminUser.PasswordHash = hasher.HashPassword(adminUser, "Admin123!");
 
-        modelBuilder.Entity<IdentityUser>().HasData(adminUser);
-
-        modelBuilder.Entity<IdentityUserClaim<string>>().HasData(new IdentityUserClaim<string>
-        {
-        Id = 1,
-        UserId = "1",
-        ClaimType = "role",
-        ClaimValue = "admin"
-        });
-
         // Skapa user-användaren
-        var userUser = new IdentityUser 
+        var userUser = new AppUser 
         {
             Id = "2", 
             UserName = "user",
@@ -61,19 +51,31 @@ public class InnoviaHubDbContext : IdentityDbContext<IdentityUser>
         };
         userUser.PasswordHash = hasher.HashPassword(userUser, "User123!");
 
-        modelBuilder.Entity<IdentityUser>().HasData(userUser);
+        modelBuilder.Entity<AppUser>().HasData(adminUser, userUser);
 
-         modelBuilder.Entity<ResourceType>()
+        // Seeda roller
+        var adminRole = new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" };
+        var userRole = new IdentityRole { Id = "2", Name = "User", NormalizedName = "USER" };
+
+        modelBuilder.Entity<IdentityRole>().HasData(adminRole, userRole);
+
+        // Koppla admin-rollen till admin-användaren
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string> { UserId = adminUser.Id, RoleId = adminRole.Id },
+            new IdentityUserRole<string> { UserId = userUser.Id, RoleId = userRole.Id }
+        );
+
+        modelBuilder.Entity<ResourceType>()
             .HasMany(rt => rt.Resources)
             .WithOne(r => r.ResourceType)
             .HasForeignKey(r => r.ResourceTypeId)
-            .OnDelete(DeleteBehavior.Restrict); // Prevent deletion of ResourceType if Resources exist.
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Resources>()
             .HasMany(r => r.Bookings)
             .WithOne(b => b.Resource)
             .HasForeignKey(b => b.ResourceId)
-            .OnDelete(DeleteBehavior.Cascade); // When a Resource is deleted, its Bookings are also deleted.
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<AppUser>()
             .HasMany(u => u.Bookings)
@@ -81,54 +83,59 @@ public class InnoviaHubDbContext : IdentityDbContext<IdentityUser>
             .HasForeignKey(b => b.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<TimeSlots>()
+            .HasMany(ts => ts.Bookings)
+            .WithOne(b => b.TimeSlot)
+            .HasForeignKey(b => b.TimeSlotId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<TimeSlots>().HasData(
-            new TimeSlots { Id = 1, startTime = new TimeSpan(8, 0, 0), endTime = new TimeSpan(10, 0, 0), Duration = 2 },
-            new TimeSlots { Id = 2, startTime = new TimeSpan(10, 0, 0), endTime = new TimeSpan(12, 0, 0), Duration = 2 },
-            new TimeSlots { Id = 3, startTime = new TimeSpan(12, 0, 0), endTime = new TimeSpan(14, 0, 0), Duration = 2 },
-            new TimeSlots { Id = 4, startTime = new TimeSpan(14, 0, 0), endTime = new TimeSpan(16, 0, 0), Duration = 2 },
+            new TimeSlots { TimeSlotsId = 1, startTime = new TimeSpan(8, 0, 0), endTime = new TimeSpan(10, 0, 0), Duration = 2 },
+            new TimeSlots { TimeSlotsId = 2, startTime = new TimeSpan(10, 0, 0), endTime = new TimeSpan(12, 0, 0), Duration = 2 },
+            new TimeSlots { TimeSlotsId = 3, startTime = new TimeSpan(12, 0, 0), endTime = new TimeSpan(14, 0, 0), Duration = 2 },
+            new TimeSlots { TimeSlotsId = 4, startTime = new TimeSpan(14, 0, 0), endTime = new TimeSpan(16, 0, 0), Duration = 2 },
 
-            new TimeSlots { Id = 5, startTime = new TimeSpan(8, 0, 0), endTime = new TimeSpan(12, 0, 0), Duration = 4 },
-            new TimeSlots { Id = 6, startTime = new TimeSpan(12, 0, 0), endTime = new TimeSpan(16, 0, 0), Duration = 4 },
+            new TimeSlots { TimeSlotsId = 5, startTime = new TimeSpan(8, 0, 0), endTime = new TimeSpan(12, 0, 0), Duration = 4 },
+            new TimeSlots { TimeSlotsId = 6, startTime = new TimeSpan(12, 0, 0), endTime = new TimeSpan(16, 0, 0), Duration = 4 },
 
-            new TimeSlots { Id = 7, startTime = new TimeSpan(8, 0, 0), endTime = new TimeSpan(16, 0, 0), Duration = 8 }
+            new TimeSlots { TimeSlotsId = 7, startTime = new TimeSpan(8, 0, 0), endTime = new TimeSpan(16, 0, 0), Duration = 8 }
         );
 
         modelBuilder.Entity<ResourceType>().HasData(
-            new ResourceType { Id = 1, Name = "Drop-in skrivbord" },
-            new ResourceType { Id = 2, Name = "Mötesrum" },
-            new ResourceType { Id = 3, Name = "VR" },
-            new ResourceType { Id = 4, Name = "AI" }
+            new ResourceType { ResourceTypeId = 1, Name = "Drop-in skrivbord" },
+            new ResourceType { ResourceTypeId = 2, Name = "Mötesrum" },
+            new ResourceType { ResourceTypeId = 3, Name = "VR" },
+            new ResourceType { ResourceTypeId = 4, Name = "AI" }
         );
 
         modelBuilder.Entity<Resources>().HasData(
-            new Resources { Id = 1, ResourceTypeId = 1, Name = "Skrivbord 1" },
-            new Resources { Id = 2, ResourceTypeId = 1, Name = "Skrivbord 2" },
-            new Resources { Id = 3, ResourceTypeId = 1, Name = "Skrivbord 3" },
-            new Resources { Id = 4, ResourceTypeId = 1, Name = "Skrivbord 4" },
-            new Resources { Id = 5, ResourceTypeId = 1, Name = "Skrivbord 5" },
-            new Resources { Id = 6, ResourceTypeId = 1, Name = "Skrivbord 6" },
-            new Resources { Id = 7, ResourceTypeId = 1, Name = "Skrivbord 7" },
-            new Resources { Id = 8, ResourceTypeId = 1, Name = "Skrivbord 8" },
-            new Resources { Id = 9, ResourceTypeId = 1, Name = "Skrivbord 9" },
-            new Resources { Id = 10, ResourceTypeId = 1, Name = "Skrivbord 10" },
-            new Resources { Id = 11, ResourceTypeId = 1, Name = "Skrivbord 11" },
-            new Resources { Id = 12, ResourceTypeId = 1, Name = "Skrivbord 12" },
-            new Resources { Id = 13, ResourceTypeId = 1, Name = "Skrivbord 13" },
-            new Resources { Id = 14, ResourceTypeId = 1, Name = "Skrivbord 14" },
-            new Resources { Id = 15, ResourceTypeId = 1, Name = "Skrivbord 15" },
+            new Resources { ResourcesId = 1, ResourceTypeId = 1, Name = "Skrivbord 1" },
+            new Resources { ResourcesId = 2, ResourceTypeId = 1, Name = "Skrivbord 2" },
+            new Resources { ResourcesId = 3, ResourceTypeId = 1, Name = "Skrivbord 3" },
+            new Resources { ResourcesId = 4, ResourceTypeId = 1, Name = "Skrivbord 4" },
+            new Resources { ResourcesId = 5, ResourceTypeId = 1, Name = "Skrivbord 5" },
+            new Resources { ResourcesId = 6, ResourceTypeId = 1, Name = "Skrivbord 6" },
+            new Resources { ResourcesId = 7, ResourceTypeId = 1, Name = "Skrivbord 7" },
+            new Resources { ResourcesId = 8, ResourceTypeId = 1, Name = "Skrivbord 8" },
+            new Resources { ResourcesId = 9, ResourceTypeId = 1, Name = "Skrivbord 9" },
+            new Resources { ResourcesId = 10, ResourceTypeId = 1, Name = "Skrivbord 10" },
+            new Resources { ResourcesId = 11, ResourceTypeId = 1, Name = "Skrivbord 11" },
+            new Resources { ResourcesId = 12, ResourceTypeId = 1, Name = "Skrivbord 12" },
+            new Resources { ResourcesId = 13, ResourceTypeId = 1, Name = "Skrivbord 13" },
+            new Resources { ResourcesId = 14, ResourceTypeId = 1, Name = "Skrivbord 14" },
+            new Resources { ResourcesId = 15, ResourceTypeId = 1, Name = "Skrivbord 15" },
 
-            new Resources { Id = 16, ResourceTypeId = 2, Name = "Mötesrum 1" },
-            new Resources { Id = 17, ResourceTypeId = 2, Name = "Mötesrum 2" },
-            new Resources { Id = 18, ResourceTypeId = 2, Name = "Mötesrum 3" },
-            new Resources { Id = 19, ResourceTypeId = 2, Name = "Mötesrum 4" },
+            new Resources { ResourcesId = 16, ResourceTypeId = 2, Name = "Mötesrum 1" },
+            new Resources { ResourcesId = 17, ResourceTypeId = 2, Name = "Mötesrum 2" },
+            new Resources { ResourcesId = 18, ResourceTypeId = 2, Name = "Mötesrum 3" },
+            new Resources { ResourcesId = 19, ResourceTypeId = 2, Name = "Mötesrum 4" },
 
-            new Resources { Id = 20, ResourceTypeId = 3, Name = "VR 1" },
-            new Resources { Id = 21, ResourceTypeId = 3, Name = "VR 2" },
-            new Resources { Id = 22, ResourceTypeId = 3, Name = "VR 3" },
-            new Resources { Id = 23, ResourceTypeId = 3, Name = "VR 4" },
+            new Resources { ResourcesId = 20, ResourceTypeId = 3, Name = "VR 1" },
+            new Resources { ResourcesId = 21, ResourceTypeId = 3, Name = "VR 2" },
+            new Resources { ResourcesId = 22, ResourceTypeId = 3, Name = "VR 3" },
+            new Resources { ResourcesId = 23, ResourceTypeId = 3, Name = "VR 4" },
 
-            new Resources { Id = 24, ResourceTypeId = 4, Name = "AI" }
+            new Resources { ResourcesId = 24, ResourceTypeId = 4, Name = "AI" }
         );
     }
-
 }

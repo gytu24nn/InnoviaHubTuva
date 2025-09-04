@@ -5,7 +5,7 @@ namespace BackEnd.Models;
 
 public class TimeSlots
 {
-    public int Id { get; set; }
+    public int TimeSlotsId { get; set; }
     public TimeSpan startTime { get; set; }
     public TimeSpan endTime { get; set; }
     public int Duration { get; set; }

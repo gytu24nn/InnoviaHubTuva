@@ -4,7 +4,7 @@ namespace BackEnd.Models;
 
 public class Booking
 {
-    public int Id { get; set; }
+    public int BookingId { get; set; }
 
     public int ResourceId { get; set; }
     public Resources Resource { get; set; }
