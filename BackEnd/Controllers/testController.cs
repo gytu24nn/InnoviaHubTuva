@@ -46,12 +46,5 @@ namespace BackEnd.Controllers
             return Ok(Resources);
         }
 
-        [HttpGet("resourcetypes")]
-        public async Task<IActionResult> GetResourceTypes()
-        {
-            var ResourceTypes = await _context.ResourceTypes.ToListAsync();
-            return Ok(ResourceTypes);
-        }
-
     }
 }
