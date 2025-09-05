@@ -1,4 +1,5 @@
 using BackEnd.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ namespace BackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ResourceController : ControllerBase
     {
         private readonly InnoviaHubDbContext _context;
@@ -68,6 +70,13 @@ namespace BackEnd.Controllers
                 .ToList();
 
             return Ok(availableResource);
+        }
+
+        [HttpGet("resourcetypes")]
+        public async Task<IActionResult> GetResourceTypes()
+        {
+            var ResourceTypes = await _context.ResourceTypes.ToListAsync();
+            return Ok(ResourceTypes);
         }
 
     }

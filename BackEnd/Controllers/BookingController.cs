@@ -11,6 +11,8 @@ using BackEnd.Models.DTOs;
 using BackEnd.Models; 
 using BackEnd.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using BackEnd.Hubs;
 
 namespace BackEnd.Controllers
 {
@@ -20,11 +22,15 @@ namespace BackEnd.Controllers
     {
 
         private readonly InnoviaHubDbContext _context;
+        private readonly IHubContext<BookingHub> _hubContext;
 
-        public BookingController(InnoviaHubDbContext context)
+        public BookingController(InnoviaHubDbContext context, IHubContext<BookingHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
+
         }
+
         [HttpPost]
         [Authorize]
         public async Task<ActionResult<BookingDTO>> CreateBooking([FromBody] CreateBookingDTO bookingDto)
@@ -75,6 +81,8 @@ namespace BackEnd.Controllers
                 EndTime = createdBooking.TimeSlot?.endTime.ToString(@"hh\:mm") ?? ""
             };
 
+            await _hubContext.Clients.All.SendAsync("BookingCreated", result);
+
             return CreatedAtAction(nameof(CreateBooking), new { id = result.BookingId }, result);
         }
 
@@ -108,7 +116,10 @@ namespace BackEnd.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBooking(int id)
         {
-            var booking = await _context.Bookings.FindAsync(id);
+            var booking = await _context.Bookings
+                .Include(b => b.Resource)
+                .Include(b => b.TimeSlot)
+                .FirstOrDefaultAsync(b => b.BookingId == id);
 
             if (booking == null)
             {
@@ -117,6 +128,20 @@ namespace BackEnd.Controllers
 
             _context.Bookings.Remove(booking);
             await _context.SaveChangesAsync();
+
+            var result = new BookingDTO
+            {
+                BookingId = booking.BookingId,
+                Date = booking.Date,
+                UserId = booking.UserId ?? "",
+                ResourceId = booking.ResourceId,
+                ResourceName = booking.Resource?.Name ?? "",
+                TimeSlotId = booking.TimeSlotId,
+                StartTime = booking.TimeSlot?.startTime.ToString(@"hh\:mm") ?? "",
+                EndTime = booking.TimeSlot?.endTime.ToString(@"hh\:mm") ?? ""
+            };
+
+            await _hubContext.Clients.All.SendAsync("BookingCancelled", result);
 
             return Ok(new { Message = $"Booking with id {id} was deleted" });
         }
