@@ -39,12 +39,5 @@ namespace BackEnd.Controllers
             return Ok(TimeSlots);
         }
 
-        [HttpGet("resources")]
-        public async Task<IActionResult> GetResources()
-        {
-            var Resources = await _context.Resources.ToListAsync();
-            return Ok(Resources);
-        }
-
     }
 }
