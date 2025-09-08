@@ -1,4 +1,5 @@
 using BackEnd.Data;
+using BackEnd.Models;
 using BackEnd.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -44,29 +45,66 @@ namespace BackEnd.Controllers
         [HttpGet("resources")]
         public async Task<IActionResult> GetAllResources()
         {
-            var Resources = await _context.Resources.ToListAsync();
-            return Ok(Resources);
+            var resources = await _context.Resources
+            .Select(r => new ResourceDTO
+            {
+                ResourceId = r.ResourcesId,
+                ResourceTypeId = r.ResourceTypeId,
+                Name = r.Name
+            })
+            .ToListAsync();
+            return Ok(resources);
         }
 
         //AddResouerces
         [HttpPost("resources")]
-        public async Task<IActionResult> AddResource()
+        public async Task<IActionResult> AddResource([FromBody] CreateResourceDTO resourceDto)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var resource = new Resources
+            {
+                ResourceTypeId = resourceDto.ResourceTypeId,
+                Name = resourceDto.Name
+            };
+
+            _context.Resources.Add(resource);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetAllResources), new { id = resource.ResourcesId }, resource);
         }
 
         //ChangeResource
-        [HttpPatch("resource/{id}")]
+        [HttpPatch("resource/edit/{id}")]
         public async Task<IActionResult> ChangeResource()
         {
             return Ok();
         }
 
         //DeleteResource
-        [HttpPatch("resource/{id}")]
-        public async Task<IActionResult> DeleteResource()
+        [HttpDelete("resource/{id}")]
+        public async Task<IActionResult> DeleteResource(int id)
         {
-            return Ok();
+
+            var resource = await _context.Resources.FindAsync(id);
+            if (resource == null)
+            {
+                return NotFound(new { Message = $"Resource with id {id} not found" });
+            }
+
+            _context.Resources.Remove(resource);
+            await _context.SaveChangesAsync();
+
+            var deletedResource = new ResourceDTO
+            {   
+                ResourceId = resource.ResourcesId,
+                ResourceTypeId = resource.ResourceTypeId,
+                Name = resource.Name
+            };
+            return Ok(deletedResource);
         }
 
         //addTimeslot
