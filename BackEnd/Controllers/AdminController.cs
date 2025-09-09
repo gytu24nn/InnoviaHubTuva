@@ -130,25 +130,130 @@ namespace BackEnd.Controllers
             return Ok(deletedResource);
         }
 
-        //addTimeslot
+        // Hämtar alla tidsluckor
+        [HttpGet("timeslots")]
+        public async Task<IActionResult> GetAllTimeSlots()
+        {
+            var slots = await _context.TimeSlots
+                .Select(t => new TimeSlotDTO
+                {
+                    TimeSlotsId = t.TimeSlotsId,
+                    StartTime = t.startTime.ToString(@"hh\\:mm"),
+                    EndTime = t.endTime.ToString(@"hh\\:mm"),
+                    Duration = t.Duration
+                })
+                .ToListAsync();
+
+            return Ok(slots);
+        }
+
+        // Skapa en ny tidslucka
         [HttpPost("timeslots")]
-        public async Task<IActionResult> AddTimeSlot()
+        public async Task<IActionResult> AddTimeSlot([FromBody] CreateTimeSlotDTO dto)
         {
-            return Ok();
+            if (!ModelState.IsValid || dto.StartTime >= dto.EndTime)
+            {
+                return BadRequest("Ogiltig tidslucka.");
+            }
+
+            // Kontrollera överlappning
+            bool overlapExists = await _context.TimeSlots.AnyAsync(t =>
+                (dto.StartTime < t.endTime && dto.EndTime > t.startTime)
+            );
+
+            if (overlapExists)
+            {
+                return Conflict("Det finns redan en tidslucka som överlappar den angivna tiden.");
+            }
+
+            var duration = (int)(dto.EndTime - dto.StartTime).TotalMinutes;
+
+            var newTimeSlot = new TimeSlots
+            {
+                startTime = dto.StartTime,
+                endTime = dto.EndTime,
+                Duration = duration
+            };
+
+            _context.TimeSlots.Add(newTimeSlot);
+            await _context.SaveChangesAsync();
+
+            var result = new TimeSlotDTO
+            {
+                TimeSlotsId = newTimeSlot.TimeSlotsId,
+                StartTime = newTimeSlot.startTime.ToString(@"hh\\:mm"),
+                EndTime = newTimeSlot.endTime.ToString(@"hh\\:mm"),
+                Duration = newTimeSlot.Duration
+            };
+
+            return CreatedAtAction(nameof(GetAllTimeSlots), new { id = newTimeSlot.TimeSlotsId }, result);
         }
 
-        //changeTimeslot
+        // Ändra en tidslucka
         [HttpPatch("timeslot/{id}")]
-        public async Task<IActionResult> ChangeTimeSlot()
+        public async Task<IActionResult> ChangeTimeSlot(int id, [FromBody] CreateTimeSlotDTO dto)
         {
-            return Ok();
+            var timeSlot = await _context.TimeSlots.FindAsync(id);
+            if (timeSlot == null)
+            {
+                return NotFound($"Ingen tidslucka hittades med id {id}");
+            }
+
+            if (dto.StartTime >= dto.EndTime)
+            {
+                return BadRequest("Ogiltig tidslucka.");
+            }
+
+            // Kontrollera överlappning, men exkludera den nuvarande tidsluckan
+            bool overlapExists = await _context.TimeSlots.AnyAsync(t =>
+                t.TimeSlotsId != id &&
+                (dto.StartTime < t.endTime && dto.EndTime > t.startTime)
+            );
+
+            if (overlapExists)
+            {
+                return Conflict("Det finns redan en annan tidslucka som överlappar den angivna tiden.");
+            }
+
+            timeSlot.startTime = dto.StartTime;
+            timeSlot.endTime = dto.EndTime;
+            timeSlot.Duration = (int)(dto.EndTime - dto.StartTime).TotalMinutes;
+
+            await _context.SaveChangesAsync();
+
+            var updatedTimeSlot = new TimeSlotDTO
+            {
+                TimeSlotsId = timeSlot.TimeSlotsId,
+                StartTime = timeSlot.startTime.ToString(@"hh\\:mm"),
+                EndTime = timeSlot.endTime.ToString(@"hh\\:mm"),
+                Duration = timeSlot.Duration
+            };
+
+            return Ok(updatedTimeSlot);
         }
 
-        //deleteTimeslot
+        // Ta bort en tidslucka
         [HttpDelete("timeslot/{id}")]
-        public async Task<IActionResult> DeleteTimeSlot()
+        public async Task<IActionResult> DeleteTimeSlot(int id)
         {
-            return Ok();
+            var timeSlot = await _context.TimeSlots.FindAsync(id);
+            if (timeSlot == null)
+            {
+                return NotFound(new { Message = $"Tidslucka med id {id} hittades inte" });
+            }
+
+            _context.TimeSlots.Remove(timeSlot);
+            await _context.SaveChangesAsync();
+
+            var deletedTimeSlot = new TimeSlotDTO
+            {
+                TimeSlotsId = timeSlot.TimeSlotsId,
+                StartTime = timeSlot.startTime.ToString(@"hh\\:mm"),
+                EndTime = timeSlot.endTime.ToString(@"hh\\:mm"),
+                Duration = timeSlot.Duration
+            };
+
+            return Ok(deletedTimeSlot);
         }
 
     }
