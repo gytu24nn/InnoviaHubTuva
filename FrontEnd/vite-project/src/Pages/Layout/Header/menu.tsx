@@ -1,20 +1,40 @@
 import "./header.css"
+import {Link, useNavigate} from "react-router-dom"
 
 type MenuProps = {
     isOpen: boolean;
 }
 
 const meny = ({isOpen}: MenuProps) => {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("Role");
+        navigate("/");
+    }
     return (
         <nav className={`menu ${isOpen ? "open" : ""}`}>
             <ul>
-
-                <li><i className="fa-solid fa-star menuStar"></i>Admin panel</li>
-                <li><i className="fa-solid fa-star menuStar"></i>Mina bokningar</li>
-                <li><i className="fa-solid fa-star menuStar"></i>Boka resurs</li>
-                <li><i className="fa-solid fa-star menuStar"></i>Logga ut</li>
+                <li>
+                    <Link className="linkMenuOption" to={"/Admin"}>
+                        Admin panel
+                    </Link>
+                </li>
+                <li>
+                    <Link className="linkMenuOption" to={"/MyBookings"}>
+                        Mina bokningar
+                    </Link>
+                </li>
+                <li>
+                    <Link className="linkMenuOption" to={"/Booking"}>
+                        Boka resurs
+                    </Link>
+                </li>
+                <li onClick={handleLogout}>
+                    Logga ut
+                </li>
             </ul>
-
         </nav>
     )
 }

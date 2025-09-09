@@ -2,6 +2,7 @@ import { useState } from "react";
 import Menu from "./menu";
 import "./Header.css"
 
+
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     // const [isLoggedIn] = useState(true); // testa true or false tills vidare
