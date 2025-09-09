@@ -2,7 +2,6 @@ using BackEnd.Data;
 using BackEnd.Models;
 using BackEnd.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +19,7 @@ namespace BackEnd.Controllers
             _context = context;
         }
 
+        // Hämtar alla bokningar
         [HttpGet("bookings")]
         public async Task<IActionResult> GetAllBookings()
         {
@@ -34,7 +34,7 @@ namespace BackEnd.Controllers
                     ResourceId = b.ResourceId,
                     ResourceName = b.Resource != null ? b.Resource.Name : "",
                     TimeSlotId = b.TimeSlotId,
-                    StartTime = b.TimeSlot != null ? b.TimeSlot.startTime.ToString(@"hh\:mm") : "",
+                    StartTime = b.TimeSlot != null ? b.TimeSlot.startTime.ToString(@"hh\:mm") : "", // Formaterar tiden bättre visuellt
                     EndTime = b.TimeSlot != null ? b.TimeSlot.endTime.ToString(@"hh\:mm") : ""
                 })
                 .ToListAsync();
@@ -42,6 +42,7 @@ namespace BackEnd.Controllers
             return Ok(bookings);
         }
 
+        // Hämtar alla resurser
         [HttpGet("resources")]
         public async Task<IActionResult> GetAllResources()
         {
@@ -56,10 +57,12 @@ namespace BackEnd.Controllers
             return Ok(resources);
         }
 
-        //AddResouerces
+        //Skapa en ny resurs
         [HttpPost("resources")]
         public async Task<IActionResult> AddResource([FromBody] CreateResourceDTO resourceDto)
         {
+
+            // Kollar om alla [Required] fält är ifyllda, annars  => 400 Bad Request
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -77,14 +80,33 @@ namespace BackEnd.Controllers
             return CreatedAtAction(nameof(GetAllResources), new { id = resource.ResourcesId }, resource);
         }
 
-        //ChangeResource
+        // Ändra en resurs, t.ex. namn eller typ. 
         [HttpPatch("resource/edit/{id}")]
-        public async Task<IActionResult> ChangeResource()
+        public async Task<IActionResult> EditResource( int id, [FromBody] EditResourceDTO editResourceDTO) 
         {
-            return Ok();
+            var resource = await _context.Resources.FindAsync(id);
+
+            if (resource == null)
+            {
+                return NotFound($" Finns ingen resurs med id: {id}");
+            }
+
+            resource.ResourceTypeId = editResourceDTO.ResourceTypeId;
+            resource.Name = editResourceDTO.Name;
+
+            await _context.SaveChangesAsync();
+
+            var updatedResource = new ResourceDTO
+            {
+                ResourceId = resource.ResourcesId,
+                ResourceTypeId = resource.ResourceTypeId,
+                Name = resource.Name
+            };
+
+            return Ok(updatedResource);
         }
 
-        //DeleteResource
+        // Ta bort en resurs
         [HttpDelete("resource/{id}")]
         public async Task<IActionResult> DeleteResource(int id)
         {
@@ -104,6 +126,7 @@ namespace BackEnd.Controllers
                 ResourceTypeId = resource.ResourceTypeId,
                 Name = resource.Name
             };
+
             return Ok(deletedResource);
         }
 
