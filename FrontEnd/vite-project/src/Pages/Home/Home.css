@@ -1,0 +1,151 @@
+.HomePage {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+    min-width: 400px;
+}
+
+.HeroSection {
+    padding: 1rem;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.HeroImage {
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    overflow: hidden;
+}
+
+.HeroImage img {
+    width: 100vw;
+    height: auto;
+    display: block;
+    border-radius: 0;
+    min-width: 0;
+    max-width: none;
+}
+
+.WelcomeText {
+    color: #000;
+    font-family: "Hermeneus One";
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin-bottom: 0.5rem;
+}
+
+.InfoText {
+    color: #000;
+    font-family: "Hepta Slab";
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin-bottom: 0.1rem;
+    line-height: 1.2;
+}
+
+.Icons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.IconBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #3D71AF;
+}
+
+.IconBox i {
+    font-size: 2rem;
+    margin: 0.5rem;
+}
+
+.GettingStartedButton {
+    background-color: #3D71AF;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    color: #FFF;
+    text-align: center;
+    font-family: "Hermeneus One";
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.GettingStartedButton:hover {
+  background-color: #1e4170;
+}
+
+/*Surfplatta*/
+@media (min-width: 600px) {
+    .HomePage {
+        max-width: 800px;
+        padding: 0 24px;
+    }
+    .HeroImage {
+        width: 100vw;
+        margin-left: 50%;
+        transform: translateX(-50%);
+        /* overflow: hidden; */
+    }
+    .HeroImage img {
+        width: 100vw;
+        max-width: none;
+        border-radius: 0;
+    }
+    .HeroSection {
+        font-size: 1.2rem;
+        padding: 2rem;
+    }
+    .Icons {
+        gap: 3rem;
+    }
+}
+
+/*Desktop*/
+@media (min-width: 900px) {
+    .HomePage {
+        max-width: 1000px;
+        padding: 0 32px;
+    }
+    .HeroImage {
+        width: 100vw;
+        margin-left: 50%;
+        transform: translateX(-50%);
+        height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .HeroImage img {
+        width: 100vw;
+        height: 100%;
+        max-width: none;
+        object-fit: cover;
+        border-radius: 0;
+        display: block;
+    }
+    .HeroSection {
+        font-size: 1.3rem;
+        padding: 2.5rem;
+    }
+    .Icons {
+        gap: 4rem;
+    }
+}
