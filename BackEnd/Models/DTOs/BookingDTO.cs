@@ -10,4 +10,5 @@ public class BookingDTO
     public int TimeSlotId { get; set; }
     public string StartTime { get; set; } = "";
     public string EndTime { get; set; } = "";
+    public string UserEmail { get; set; } = "";
 }
