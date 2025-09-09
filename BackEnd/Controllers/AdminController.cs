@@ -9,7 +9,7 @@ namespace BackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly InnoviaHubDbContext _context;
@@ -26,11 +26,13 @@ namespace BackEnd.Controllers
             var bookings = await _context.Bookings
                 .Include(b => b.Resource)
                 .Include(b => b.TimeSlot)
+                .Include(b => b.User)
                 .Select(b => new BookingDTO
                 {
                     BookingId = b.BookingId,
                     Date = b.Date,
                     UserId = b.UserId ?? "",
+                    UserEmail = b.User != null ? b.User.Email : "Okänd användare",
                     ResourceId = b.ResourceId,
                     ResourceName = b.Resource != null ? b.Resource.Name : "",
                     TimeSlotId = b.TimeSlotId,
@@ -42,16 +44,26 @@ namespace BackEnd.Controllers
             return Ok(bookings);
         }
 
+        // Hämtar alla resurstyper
+        [HttpGet("resourcetypes")]
+        public async Task<IActionResult> GetAllResourceTypes()
+        {
+            var resourceTypes = await _context.ResourceTypes.ToListAsync();
+            return Ok(resourceTypes);
+        }
+
         // Hämtar alla resurser
         [HttpGet("resources")]
         public async Task<IActionResult> GetAllResources()
         {
             var resources = await _context.Resources
+            .Include(r => r.ResourceType)
             .Select(r => new ResourceDTO
             {
                 ResourceId = r.ResourcesId,
                 ResourceTypeId = r.ResourceTypeId,
-                Name = r.Name
+                Name = r.Name,
+                ResourceTypeName = r.ResourceType != null ? r.ResourceType.Name : ""
             })
             .ToListAsync();
             return Ok(resources);
