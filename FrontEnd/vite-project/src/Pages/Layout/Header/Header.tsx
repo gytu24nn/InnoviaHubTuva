@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Menu from "./menu";
 import "./Header.css"
 
@@ -9,7 +10,12 @@ const Header = () => {
     return (
         
         <header className="header">
-            <h1 className="logo">Innovia Hub</h1>
+            <h1 className="logo">
+                <Link className="logo" to={"/Home"}>
+                    Innovia Hub
+                </Link>
+                
+            </h1>
             <i 
                 className="fa-solid fa-bars menu-icon"
                 onClick={() => setIsOpen(!isOpen)}
