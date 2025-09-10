@@ -8,6 +8,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using System;
 using BackEnd.Models;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace BackEnd.Controllers
@@ -62,42 +63,110 @@ namespace BackEnd.Controllers
                     var roles = await _userManager.GetRolesAsync(user);
                     var roleClaim = roles.FirstOrDefault() ?? "user";
 
+                    var Issuer = _configuration["JwtSettings:Issuer"] ?? "https://localhost:5099";
+                    var Audience = _configuration["JwtSettings:Audience"] ?? "https://localhost:5099";
+                    var Secret = _configuration["JwtSettings:Secret"] ?? "SuperDuperUltraMegaSecureJWTSecretKeyThatIsLongEnough!";
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secret));
+                    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = Encoding.ASCII.GetBytes("SuperDuperUltraMegaSecureJWTSecretKeyThatIsLongEnough!");
-
-                    var tokenDescriptor = new SecurityTokenDescriptor
+                    var claims = new[]
                     {
-                        Issuer = "http://localhost:5099",
-                        Audience = "http://localhost:5099",
-                        Subject = new ClaimsIdentity(new Claim[] {
                         new Claim(ClaimTypes.Name, user.UserName),
                         new Claim(ClaimTypes.Role, roleClaim),
                         new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    }),
-                        Expires = DateTime.UtcNow.AddHours(1),
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                     };
 
-                    var token = tokenHandler.CreateToken(tokenDescriptor);
-                    var tokenString = tokenHandler.WriteToken(token);
+                    var token = new JwtSecurityToken(
+                        issuer: Issuer,
+                        audience: Audience,
+                        claims: claims,
+                        expires: DateTime.Now.AddHours(1),
+                        signingCredentials: creds
+                        );
+                    var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 
-                    if (roleClaim.ToLower() == "user")
+                    Response.Cookies.Append("auth", tokenString, new CookieOptions
                     {
-                        return Ok(new
-                        {
-                            user.Id,
-                            user.UserName,
-                            Role = roleClaim,
-                            Token = tokenString,
-                        });
-                    }
+                        HttpOnly = true,
+                        Secure = false, // sätt till true i produktion med HTTPS
+                        SameSite = SameSiteMode.Lax,
+                        Expires = DateTimeOffset.UtcNow.AddHours(1),
+                        Path = "/"
+                    });
+
+                    return Ok(new { user.Id, user.UserName, Role = roleClaim });
+
+
+
+                    // var tokenHandler = new JwtSecurityTokenHandler();
+                    // var key = Encoding.ASCII.GetBytes("SuperDuperUltraMegaSecureJWTSecretKeyThatIsLongEnough!");
+
+                    // var tokenDescriptor = new SecurityTokenDescriptor
+                    // {
+                    //     Issuer = "http://localhost:5099",
+                    //     Audience = "http://localhost:5099",
+                    //     Subject = new ClaimsIdentity(new Claim[] {
+                    //     new Claim(ClaimTypes.Name, user.UserName),
+                    //     new Claim(ClaimTypes.Role, roleClaim),
+                    //     new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    // }),
+                    //     Expires = DateTime.UtcNow.AddHours(1),
+                    //     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    // };
+
+                    // var token = tokenHandler.CreateToken(tokenDescriptor);
+                    // var tokenString = tokenHandler.WriteToken(token);
+
+                    // if (roleClaim.ToLower() == "user")
+                    // {
+                    //     return Ok(new
+                    //     {
+                    //         user.Id,
+                    //         user.UserName,
+                    //         Role = roleClaim,
+                    //         Token = tokenString,
+                    //     });
+                    // }
 
                     // Om admin
-                    return Ok(new { user.Id, user.UserName, Role = roleClaim, Token = tokenString });
+                    // return Ok(new { user.Id, user.UserName, Role = roleClaim, Token = tokenString });
                 }
                 return Unauthorized();
             }
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> Me()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.Users.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null) return NotFound();
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Ok(new
+            {
+                id = user.Id,
+                username = user.UserName,
+                roles
+            });
+
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("auth", new CookieOptions { Path = "/" });
+          
+            return Ok();
         }
     }
 }

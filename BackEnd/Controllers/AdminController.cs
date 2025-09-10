@@ -142,10 +142,15 @@ namespace BackEnd.Controllers
             return Ok(deletedResource);
         }
 
+
+        //DeleteResource
+        [HttpDelete("resource/{id}")]
+        public async Task<IActionResult> DeleteResource()
+
         // Hämtar alla tidsluckor
         [HttpGet("timeslots")]
         public async Task<IActionResult> GetAllTimeSlots()
-        {
+         {
             var slots = await _context.TimeSlots
                 .Select(t => new TimeSlotDTO
                 {

@@ -10,6 +10,8 @@ using BackEnd.Settings;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.OpenApi.Models;
 using BackEnd.Hubs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,23 +76,49 @@ if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.Secret))
 var secretKey = jwtSettings.Secret;
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = "JwtBearer";
-    options.DefaultChallengeScheme = "JwtBearer";
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer("JwtBearer", options =>
+.AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
+
+    var issuer = string.IsNullOrWhiteSpace(jwtSettings?.Issuer) ? "http://localhost:5099" : jwtSettings!.Issuer!;
+    var audience = string.IsNullOrWhiteSpace(jwtSettings?.Audience) ? "http://localhost:5099" : jwtSettings!.Audience!;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
-        ValidIssuer = "http://localhost:5099",
-        ValidAudience = "http://localhost:5099",
+        ValidIssuer = issuer,
+        ValidAudience = audience,
         ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
         IssuerSigningKey = new SymmetricSecurityKey(secretKey != null ? Encoding.UTF8.GetBytes(secretKey) : throw new InvalidOperationException("JWT secret key is null")),
+        ClockSkew = TimeSpan.FromMinutes(1)
+    };
+
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var hasAuthHeader = !string.IsNullOrEmpty(context.Request.Headers["Authorization"]);
+            if (!hasAuthHeader)
+            {
+                var cookieToken = context.Request.Cookies["auth"];
+                if (!string.IsNullOrEmpty(cookieToken))
+                {
+                    context.Token = cookieToken;
+                }
+            }
+            return Task.CompletedTask;
+        }
     };
 });
+
+builder.Services.AddAuthorization();
 
 
 
