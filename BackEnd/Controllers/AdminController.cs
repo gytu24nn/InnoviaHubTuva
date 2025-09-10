@@ -143,9 +143,6 @@ namespace BackEnd.Controllers
         }
 
 
-        //DeleteResource
-        [HttpDelete("resource/{id}")]
-        public async Task<IActionResult> DeleteResource()
 
         // Hämtar alla tidsluckor
         [HttpGet("timeslots")]
