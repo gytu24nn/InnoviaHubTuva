@@ -9,28 +9,25 @@ import Admin from './Pages/Admin/admin';
 import MyBookings from './Pages/MyBookings/MyBookings';
 import Home from './Pages/Home/Home';
 import Booking from './Pages/Booking/Booking';
+import { BookingProvider } from "./Context/BookingContext";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
+    <BookingProvider>
       <Router>
         <Routes>
-          <Route path='/' element={<SignIn />}/>
-          <Route path='/SignUp' element={<SignUp />} />
-
+          <Route path="/" element={<SignIn />} />
+          <Route path="/SignUp" element={<SignUp />} />
           <Route element={<Layout />}>
-            <Route path='/Admin' element={<Admin />} />
-            <Route path='/MyBookings' element={<MyBookings />} />
-            <Route path='/Home' element={<Home />} />
-            <Route path='/Booking' element={<Booking />} />
+            <Route path="/Admin" element={<Admin />} />
+            <Route path="/MyBookings" element={<MyBookings />} />
+            <Route path="/Home" element={<Home />} />
+            <Route path="/Booking" element={<Booking />} />
           </Route>
-          
         </Routes>
       </Router>
-    </>
-  )
+    </BookingProvider>
+  );
 }
 
-export default App
+export default App;
