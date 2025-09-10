@@ -1,0 +1,159 @@
+/* Page layout */
+.PageLayout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    /* min-height: 100vh; */
+}
+
+/* Resource container */
+.ResourceContainer {
+    width: 100%;
+    border-radius: 25px;
+    background-color: #d9d9d9;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    transition: max-width 0.3s ease;
+}
+
+/* Headings */
+.Info-text {
+    margin-bottom: 1rem;
+}
+
+#ResourceHeadLine {
+    color: #000;
+    font-family: "Hermeneus One", sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0;
+}
+
+#ResourceInfoText {
+    color: #333;
+    font-size: 14px;
+    margin-top: 0.3rem;
+}
+
+/* Resource list */
+.ResourceList {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.ResourceItem {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.ResourceItem i {
+    color: #3D71AF;
+    margin-right: 0.8rem;
+    font-size: 18px;
+}
+
+.ResourceItem-Link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    color: #000;
+    font-weight: 500;
+    width: 100%;
+}
+
+.ResourceItem:hover {
+    background-color: #eef4ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    cursor: pointer;
+}
+
+/* Booking summary */
+.BookingSummaryContainer {
+    background-color: #d9d9d9;
+    border-radius: 15px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.BookingSummaryContainer h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.BookingSummaryContainer h3 i {
+    color: #3D71AF;
+    font-size: 18px;
+}
+
+.BookingSummaryContainer p {
+    font-size: 12px;
+    color: #333;
+    margin: 0;
+}
+
+/* "Visa"-knapp */
+.BookingButton {
+    background-color: #eef4ff;
+    color: #3D71AF;
+    font-weight: 600;
+    padding: 0.4rem 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+}
+
+.BookingButton:hover {
+    background-color: #d8e7ff;
+}
+
+/* Desktop layout – först här bredvid varandra */
+@media (min-width: 900px) {
+    .PageLayout {
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 2rem 4rem;
+        gap: 3rem;
+    }
+
+    .ResourceContainer {
+        flex: 3;
+        max-width: 600px;
+        padding: 2rem;
+    }
+
+    .BookingSummaryContainer {
+        flex: 1.2;
+        align-self: flex-start;
+        padding: 1rem 1.5rem;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #eef4ff, #ffffff);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+}
+
