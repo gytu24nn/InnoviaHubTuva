@@ -63,7 +63,7 @@ namespace BackEnd.Controllers
         }
 
         //DeleteResource
-        [HttpPatch("resource/{id}")]
+        [HttpDelete("resource/{id}")]
         public async Task<IActionResult> DeleteResource()
         {
             return Ok();
