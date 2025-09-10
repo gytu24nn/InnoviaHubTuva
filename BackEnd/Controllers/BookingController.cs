@@ -123,7 +123,7 @@ namespace BackEnd.Controllers
         }
         
 [HttpGet("mybookings")]
-[Authorize]
+//[Authorize]
 public async Task<IActionResult> GetAllMyBookings()
 {
     // Hämta inloggad användares Id från token
