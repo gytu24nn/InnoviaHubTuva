@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./Admin.css"
 
 const admin = () => {
     const [resources, setResources] = useState<Resource[]>([]);
@@ -6,6 +7,7 @@ const admin = () => {
     const [newResource, setNewResource] = useState<{ resourceTypeId: string; name: string }>({ resourceTypeId: "", name: ""});
     const [editResource, setEditResource] = useState({ id: "", resourceTypeId: "", name: "" });
     const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([]);
+    const [editingResourceId, setEditingResourceId] = useState<number | null>(null);
 
     // Typ för en tidslucka
     type TimeSlot = {
@@ -120,7 +122,7 @@ return (
     <h1>Admin Panel</h1>
 
             {/* KNAPP FÖR ATT VISA BOKNINGAR */}
-            <button id="" onClick={() => setShowBookings(!showBookings)}>
+            <button className="GettingStartedButton" onClick={() => setShowBookings(!showBookings)}>
                 {showBookings ? "Dölj bokningar" : "Se alla bokningar"}
             </button>
 
@@ -143,7 +145,7 @@ return (
             )}
 
             {/* KNAPP FÖR ATT VISA RESURSER */}
-            <button id="" onClick={() => setShowResources(!showResources)}>
+            <button className="GettingStartedButton" onClick={() => setShowResources(!showResources)}>
                 {showResources ? "Dölj resurser" : "Se alla resurser"}
             </button>
 
@@ -151,24 +153,35 @@ return (
             {showResources && (
                 <div id="resources-list">
                     <h2>Befintliga resurser</h2>
-                    <ul id="resource-ul">
-                        {resources.map((resource) => (
-                            <li key={resource.resourceId} className="resource-item"> {/* ÄNDRAT TILL resourceId */}
-                                <span className="resource-details">
-                                    <strong>ID:</strong> {resource.resourceId} | <strong>Namn:</strong> {resource.name} |{" "}
-                                    <strong>Resurstyp:</strong> {resource.resourceTypeName}
-                                </span>
-                                <button id="" onClick={() => deleteResource(resource.resourceId)} className="delete-resource-btn">
-                                    Radera
-                                </button>
-                            </li>
-                        ))}
+                      <ul id="resource-ul">
+                          {resources.map((resource) => (
+                              <li key={resource.resourceId} className="resource-item">
+                                  <span className="resource-details">
+                                      <strong>ID:</strong> {resource.resourceId} | <strong>Namn:</strong> {resource.name} |{" "}
+                                      <strong>Resurstyp:</strong> {resource.resourceTypeName}
+                                  </span>
+                                  <div className="resource-actions"> {/* Ny behållare för knapparna */}
+                                      <button
+                                          className="edit-resource-btn"
+                                          onClick={() => setEditingResourceId(resource .resourceId)}
+                                      >
+                                          ✏️
+                                      </button>
+                                      <button
+                                          className="delete-resource-btn"
+                                          onClick={() => deleteResource(resource.resourceId)}
+                                      >
+                                          Radera
+                                      </button>
+                                  </div>
+                              </li>
+                          ))}
                     </ul>
                 </div> 
             )}
 
             {/* NY KNAPP FÖR ATT VISA FORMULÄR FÖR ATT LÄGGA TILL RESURS */}
-            <button onClick={() => setShowAddResourceForm(!showAddResourceForm)}>
+            <button className="GettingStartedButton" onClick={() => setShowAddResourceForm(!showAddResourceForm)}>
                 {showAddResourceForm ? "Dölj formulär" : "Lägg till ny resurs"}
             </button>
 
@@ -176,13 +189,7 @@ return (
             {showAddResourceForm && (
                 <div id="create-resource-form">
                     <h2>Skapa ny resurs</h2>
-                    <input
-                        type="text"
-                        placeholder="Resursnamn"
-                        value={newResource.name}
-                        onChange={(e) => setNewResource({ ...newResource, name: e.target.value })}
-                        id="new-resource-name"
-                    />
+
                     <select
                         value={newResource.resourceTypeId}
                         onChange={(e) => setNewResource({ ...newResource, resourceTypeId: e.target.value })}
@@ -195,6 +202,13 @@ return (
                             </option>
                         ))}
                     </select>
+                    <input
+                        type="text"
+                        placeholder="Namn på resurs"
+                        value={newResource.name}
+                        onChange={(e) => setNewResource({ ...newResource, name: e.target.value })}
+                        id="new-resource-name"
+                    />
                     <button onClick={createResource} id="create-resource-btn">
                         Lägg till resurs
                     </button>
