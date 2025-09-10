@@ -9,6 +9,7 @@ import Admin from './Pages/Admin/admin';
 import MyBookings from './Pages/MyBookings/MyBookings';
 import Home from './Pages/Home/Home';
 import Booking from './Pages/Booking/Booking';
+import Resursvy from './Pages/Booking/Resursvy';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -23,6 +24,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path='/Admin' element={<Admin />} />
             <Route path='/MyBookings' element={<MyBookings />} />
+            <Route path='/Resursvy' element={<Resursvy />} />
             <Route path='/Home' element={<Home />} />
             <Route path='/Booking' element={<Booking />} />
           </Route>

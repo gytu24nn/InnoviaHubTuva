@@ -8,7 +8,7 @@ namespace BackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ResourceController : ControllerBase
     {
         private readonly InnoviaHubDbContext _context;

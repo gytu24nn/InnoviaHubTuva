@@ -12,7 +12,6 @@ type Booking = {
   endTime: string;
 };
 
-
 const MyBookings = () => {
   const apiBase = "http://localhost:5099/api/Booking";
   const [bookings, setBookings] = useState<Booking[]>([]);
