@@ -108,14 +108,16 @@ const admin = () => {
     };
 
     const deleteResource = async (id: number) => {
+
+      const userConfirmed = window.confirm("Är du säker på att du vill radera denna resurs? Detta går inte att ångra.");
+
+      if (userConfirmed){
       await fetch(`${apiBase}/resource/${id}`, {
         method: "DELETE",
       });
       fetchResources();
-      };
-
-
-
+      }
+    };
 
 return (
   <div id="admin-panel">
@@ -185,7 +187,7 @@ return (
                 {showAddResourceForm ? "Dölj formulär" : "Lägg till ny resurs"}
             </button>
 
-            {/* VILLKORLIG RENDERING AV FORMULÄRET */}
+            {/* VISA FORMULÄRET FÖR ATT LÄGGA TILL RESURS */}
             {showAddResourceForm && (
                 <div id="create-resource-form">
                     <h2>Skapa ny resurs</h2>
@@ -214,7 +216,32 @@ return (
                     </button>
                 </div>
             )}
-        </div>
+              {/* FORMULÄR FÖR ATT REDIGERA RESURS */}
+                {editResource.id && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2>Redigera resurs</h2>
+                        <select
+                            value={editResource.resourceTypeId}
+                            onChange={(e) => setEditResource({ ...editResource, resourceTypeId: e.target.value })}
+                        >
+                            {resourceTypes.map((type) => (
+                                <option key={type.resourceTypeId} value={type.resourceTypeId}>
+                                    {type.name}
+                                </option>
+                            ))}
+                        </select>
+                        <input
+                            type="text"
+                            value={editResource.name}
+                            onChange={(e) => setEditResource({ ...editResource, name: e.target.value })}
+                        />
+                        <button onClick={submitEditResource}>Spara ändringar</button>
+                        <button onClick={() => setEditResource({ id: "", resourceTypeId: "", name: "" })}>Avbryt</button>
+                    </div>
+                </div>
+            )}
+  </div>
   );
 }
 

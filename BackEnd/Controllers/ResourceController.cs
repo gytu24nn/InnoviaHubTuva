@@ -79,5 +79,23 @@ namespace BackEnd.Controllers
             return Ok(ResourceTypes);
         }
 
+        [HttpGet("resourcetypes/{id}")]
+        public async Task<IActionResult> GetResourcesType(int id)
+        {
+            var resourceType = await _context.ResourceTypes
+            .Select(rt => new
+            {
+                rt.ResourceTypeId,
+                rt.Name
+            })
+            .FirstOrDefaultAsync(rt => rt.ResourceTypeId == id);
+
+            if (resourceType == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(resourceType);
+        }
     }
 }
