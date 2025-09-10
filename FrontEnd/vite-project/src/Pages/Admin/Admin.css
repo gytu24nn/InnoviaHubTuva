@@ -3,17 +3,19 @@
     font-family: Arial, sans-serif;
     max-width: 900px;
     margin: 20px auto;
-    padding: 20px;
-    background-color: #f0f2f5;
-    border-radius: 12px;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 25px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 h1, h2 {
     text-align: center;
-    color: #333;
+    color: #000;
     font-family: "Hermeneus One", sans-serif;
-    margin-bottom: 20px;
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 1rem;
 }
 
 /* Stilar för alla huvudknappar */
@@ -25,28 +27,31 @@ h1, h2 {
     border: none;
     padding: 1rem 1.5rem;
     font-size: 1.2rem;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
     text-align: center;
     font-family: "Hermeneus One", sans-serif;
     font-weight: 400;
     margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .GettingStartedButton:hover {
     background-color: #2e598c;
     transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Container för listorna */
 #bookings-list,
-#resources-list {
-    background-color: #fff;
+#resources-list,
+#create-resource-form {
+    background-color: #d9d9d9;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 25px;
     margin-top: 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* Stilar för listor (ul) */
@@ -54,18 +59,25 @@ h1, h2 {
 #resource-ul {
     list-style-type: none;
     padding: 0;
-    margin: 0;
+    margin: 1rem 0 0;
 }
 
 /* Stilar för varje listelement i bokningslistan */
 .booking-item {
-    background-color: #e9ecef;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    background-color: #eef4ff;
+    border: 1px solid #d8e7ff;
+    border-radius: 12px;
     padding: 12px 15px;
     margin-bottom: 8px;
     color: #555;
     font-size: 14px;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.booking-item:hover {
+    background-color: #d8e7ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
 
 /* Stilar för varje listelement i resurslistan */
@@ -74,10 +86,17 @@ h1, h2 {
     justify-content: space-between;
     align-items: center;
     background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px 15px;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
     margin-bottom: 10px;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.resource-item:hover {
+    background-color: #eef4ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    cursor: pointer;
 }
 
 /* Stilar för behållaren med redigerings- och raderingsknapparna */
@@ -91,10 +110,11 @@ h1, h2 {
 .delete-resource-btn {
     padding: 8px 12px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .edit-resource-btn {
@@ -104,6 +124,7 @@ h1, h2 {
 
 .edit-resource-btn:hover {
     background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .delete-resource-btn {
@@ -113,6 +134,7 @@ h1, h2 {
 
 .delete-resource-btn:hover {
     background-color: #c82333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Stilar för formuläret för att lägga till ny resurs */
@@ -120,34 +142,30 @@ h1, h2 {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 #create-resource-form input,
 #create-resource-form select {
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 1rem;
 }
 
 #create-resource-btn {
-    background-color: #3528a7;
+    background-color: #3D71AF;
     color: white;
     border: none;
     padding: 12px;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 1rem;
     transition: background-color 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #create-resource-btn:hover {
-    background-color: #218838;
+    background-color: #2e598c;
 }
 
 /* Stilar för modalen (pop-up för redigering) */
@@ -167,7 +185,7 @@ h1, h2 {
 .modal-content {
     background-color: #fff;
     padding: 25px;
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     width: 90%;
     max-width: 500px;
@@ -180,25 +198,25 @@ h1, h2 {
 .modal-content select {
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 1rem;
 }
 
 .modal-content button {
     padding: 10px 15px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
 .modal-content button:first-of-type { /* Spara-knappen */
-    background-color: #3528a7;
+    background-color: #3D71AF;
     color: white;
 }
 
 .modal-content button:first-of-type:hover {
-background-color: #3528a7;
+    background-color: #2e598c;
 }
 
 .modal-content button:last-of-type { /* Avbryt-knappen */
