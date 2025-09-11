@@ -1,5 +1,7 @@
 import "./header.css"
 import {Link, useNavigate} from "react-router-dom"
+import { logout } from "../../../Services/authService";
+import { useState } from "react";
 
 type MenuProps = {
     isOpen: boolean;
@@ -7,11 +9,22 @@ type MenuProps = {
 
 const meny = ({isOpen}: MenuProps) => {
     const navigate = useNavigate();
+    const [loggingOut, setLoggingOut] = useState(false);
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("Role");
-        navigate("/");
+    const handleLogout = async () => {
+        if (loggingOut) return; // Prevent multiple clicks
+        setLoggingOut(true);
+        try {
+            await logout();
+        }catch {
+            console.error("Logout failed");
+        } finally {
+            localStorage.removeItem("token");
+            localStorage.removeItem("Role");
+            navigate("/", {replace: true});
+            setLoggingOut(false);
+        }
+        
     }
     return (
         <nav className={`menu ${isOpen ? "open" : ""}`}>
@@ -27,12 +40,19 @@ const meny = ({isOpen}: MenuProps) => {
                     </Link>
                 </li>
                 <li>
-                    <Link className="linkMenuOption" to={"/Resursvy"}>
+                    <Link className="linkMenuOption" to={"/Booking"}>
                        <i className="fa-solid fa-star"></i>Boka resurs
                     </Link>
                 </li>
-                <li onClick={handleLogout}>
-                    <i className="fa-solid fa-star"></i>Logga ut
+                <li>
+                <button
+                    type="button"
+                    className="linkMenuOption as-button"
+                    onClick={handleLogout}
+                    disabled={loggingOut}
+                >
+                    <i className="fa-solid fa-star"></i>{loggingOut ? "Loggar ut..." : "Logga ut"}
+                </button>
                 </li>
             </ul>
         </nav>

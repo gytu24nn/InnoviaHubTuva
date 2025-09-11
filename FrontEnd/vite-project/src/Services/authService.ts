@@ -69,9 +69,14 @@ export async function fetchMe() {
 }
 
 //log out, delete cookie
-export async function logout(): Promise<void> {
-    await fetch(`${API}/api/auth/logout`, {
+export async function logout(): Promise<boolean> {
+    try {
+    const res = await fetch(`${API}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
     });
+    return res.ok;
+    } catch {
+        return false;
+    }
 }
