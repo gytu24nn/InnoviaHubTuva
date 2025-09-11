@@ -17,22 +17,27 @@ const MyBookingsSummary = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const fetchMyBookings = async () => {
-        try {
-            const response = await fetch(`${bookingApi}/mybookings`, {
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}` // om du använder token
-                }
-            });
-            if (!response.ok) throw new Error("Något gick fel vid hämtning av bokningar.");
-            const data = await response.json();
-            setBookings(data);
-        } catch (err) {
-            setError((err as Error).message);
-        } finally {
-            setLoading(false);
-        }
-    };
+     //fetch my bookings
+  const fetchMyBookings = async () => {
+    try {
+      const response = await fetch(`${bookingApi}/mybookings`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error("Något gick fel vid hämtning av bokningar.");
+      }
+      const data = await response.json();
+      setBookings(data);
+
+    } catch (err) {
+      setError((err as Error).message);
+
+    } finally {
+      setLoading(false);
+    }
+  };
 
     useEffect(() => {
         fetchMyBookings();

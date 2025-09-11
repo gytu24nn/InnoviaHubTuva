@@ -6,7 +6,7 @@ type LoginResponse = {
     role: string;
 };
 
-export async function signIn(username: string, password: string): Promise<LoginResponse> {
+export async function signIn(username: string, password: string) {
     const response = await fetch(`${API}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -55,7 +55,7 @@ export async function registerUser(username: string, password: string, isAdmin =
 
 
 //get current user through /me endpoint
-export async function fetchMe() : Promise<LoginResponse | null> {
+export async function fetchMe() {
     const response = await fetch(`${API}/api/auth/me`, {
         credentials: 'include',
     });
