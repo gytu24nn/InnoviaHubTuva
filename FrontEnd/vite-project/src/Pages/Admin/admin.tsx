@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Admin.css"
+import "../../ErrorAndLoading.css"
 
 const admin = () => {
     const [resources, setResources] = useState<Resource[]>([]);
@@ -10,13 +11,8 @@ const admin = () => {
     const [selectedResourceType, setSelectedResourceType] = useState<number | null>(null);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-
-    // Typ för en tidslucka
-    type TimeSlot = {
-      timeSlotsId: number;
-      startTime: string; 
-      endTime: string;   
-    };
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     // Typ för en bokning
     type Booking = {
@@ -53,32 +49,31 @@ const admin = () => {
     const apiBase = "http://localhost:5099/api"; 
     const adminApiBase = `${apiBase}/admin`;
     const authApiBase = `${apiBase}/auth`;
-    const bookingApiBase = `${apiBase}/booking`;
 
     // Funktion för att hämta användarens behörighet från servern
     const checkUserRole = async () => {
-        try {
-            const response = await fetch(`${authApiBase}/me`, {
-                credentials: 'include'
-            });
-            
-            if (response.ok) {
-                const user = await response.json();
-                setIsAdmin(user.roles.includes("Admin"));
-            } else {
-                setIsAdmin(false); 
-            }
-        } catch (error) {
-            console.error("Fel vid behörighetskontroll:", error);
-            setIsAdmin(false);
+      setLoading(true);
+      setError("");
+      try {
+        const response = await fetch(`${authApiBase}/me`, {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const user = await response.json();
+          setIsAdmin(user.roles.includes("Admin"));
+        } else {
+          setIsAdmin(false); 
         }
+      } catch (err) {
+        console.error("Fel vid behörighetskontroll:", err);
+        setError("Kunde inte verifiera behörighet.");
+        setIsAdmin(false);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // useEffect för att kontrollera behörighet vid komponentens start
-    useEffect(() => {
-        checkUserRole();
-    }, []);
-    
     // Hämta alla resurser
     const fetchResources = async () => {
         try {
@@ -86,8 +81,9 @@ const admin = () => {
             if (!response.ok) { throw new Error('Kunde inte hämta resurser.'); }
             const data = await response.json();
             setResources(data);
-        } catch (error) {
-            console.error("Kunde inte hämta resurser:", error);
+        } catch (err) {
+            console.error("Kunde inte hämta resurser:", err);
+            setError("Kunde inte hämta resurser.");
         }
     }
 
@@ -98,8 +94,9 @@ const admin = () => {
             if (!response.ok) { throw new Error('Kunde inte hämta bokningar.'); }
             const data = await response.json();
             setBookings(data);
-        } catch (error) {
-            console.error("Kunde inte hämta bokningar:", error);
+        } catch (err) {
+            console.error("Kunde inte hämta bokningar:", err);
+            setError("Kunde inte hämta bokningar.");
         }
     }
 
@@ -109,38 +106,24 @@ const admin = () => {
             if (!response.ok) { throw new Error('Kunde inte hämta resurstyper.'); }
             const data: ResourceType[] = await response.json();
             setResourceTypes(data);
-        } catch (error) {
-            console.error("Kunde inte hämta resurstyper:", error);
+        } catch (err) {
+            console.error("Kunde inte hämta resurstyper:", err);
+            setError("Kunde inte hämta resurstyper.");
         }
     };
-
-    // FLYTTADE DENNA useEffect TILL TOPPEN
-    useEffect(() => {
-        if (isAdmin) {
-            fetchBookings();
-            fetchResources();
-            fetchResourceTypes();
-        }
-    }, [isAdmin]);
-
-    // Visa laddningsstatus medan vi väntar på behörighetskontrollen
-    if (isAdmin === null) {
-        return (
-            <div id="admin-panel">
-                <h1>Laddar behörighet...</h1>
-            </div>
-        );
-    }
     
-    // Om användaren inte är admin, returnera ett felmeddelande
-    if (!isAdmin) {
-        return (
-            <div id="admin-panel">
-                <h1>Åtkomst nekad</h1>
-                <p>Du har inte behörighet att se denna sida.</p>
-            </div>
-        );
-    }
+    // Anrop till API-slutpunkter vid komponentens start
+    useEffect(() => {
+        checkUserRole();
+    }, []);
+
+    useEffect(() => {
+      if (isAdmin) {
+          fetchBookings();
+          fetchResources();
+          fetchResourceTypes();
+      }
+    }, [isAdmin]);
 
     // Skapa en ny resurs
     const createResource = async () => {
@@ -157,8 +140,9 @@ const admin = () => {
             });
             setNewResource({ resourceTypeId: "", name: ""});
             fetchResources();
-        } catch (error) {
-            console.error("Kunde inte skapa resurs:", error);
+        } catch (err) {
+            console.error("Kunde inte skapa resurs:", err);
+            setError("Kunde inte skapa resurs.");
         }
     };
 
@@ -176,8 +160,9 @@ const admin = () => {
             });
             setEditResource({ id: "", resourceTypeId: "", name: "" });
             fetchResources();
-        } catch (error) {
-            console.error("Kunde inte uppdatera resurs:", error);
+        } catch (err) {
+            console.error("Kunde inte uppdatera resurs:", err);
+            setError("Kunde inte uppdatera resurs.");
         }
     };
 
@@ -190,8 +175,9 @@ const admin = () => {
                     credentials: 'include'
                 });
                 fetchResources();
-            } catch (error) {
-                console.error("Kunde inte radera resurs:", error);
+            } catch (err) {
+                console.error("Kunde inte radera resurs:", err);
+                setError("Kunde inte radera resurs.");
             }
         }
     };
@@ -208,9 +194,36 @@ const admin = () => {
         }
         return booking.date.split('T')[0] === selectedDate;
     });
+
+    // Visa laddningsstatus medan vi väntar på behörighetskontrollen
+    if (loading) {
+        return (
+            <div id="admin-panel">
+                <div className="errorAndLoadingMessage-container">
+                    <p className="loading-message">Laddar...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Om användaren inte är admin, returnera ett felmeddelande
+    if (!isAdmin) {
+        return (
+            <div id="admin-panel">
+                <div className="errorAndLoadingMessage-container">
+                    <p className="error-message">Åtkomst nekad - du har inte behörighet att se denna sida.</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div id="admin-panel">
             <h1>Admin Panel</h1>
+
+            <div className="errorAndLoadingMessage-container">
+                {error && <p className='error-message'>{error}</p>}
+            </div>
 
             {/* KNAPP FÖR ATT VISA BOKNINGAR */}
             <button className="GettingStartedButton" onClick={() => setShowBookings(!showBookings)}>
@@ -237,7 +250,7 @@ const admin = () => {
                                 <strong>Boknings-ID:</strong> {booking.bookingId} | <strong>Resurs:</strong> {booking.resourceName} |{" "}
                                 <strong>Datum:</strong> {new Date(booking.date).toLocaleDateString()} |{" "}
                                 <strong>Tid:</strong> {booking.startTime} | <strong>Slut:</strong> {booking.endTime} |
-                                <strong>Bokad av:</strong> {booking.userName}
+                                <strong>Bokad av:</strong> {booking.userName} 
                             </li>
                         ))}
                     </ul>
@@ -311,7 +324,6 @@ const admin = () => {
             {showAddResourceForm && (
                 <div id="create-resource-form">
                     <h2>Skapa ny resurs</h2>
-
                     <select
                         value={newResource.resourceTypeId}
                         onChange={(e) => setNewResource({ ...newResource, resourceTypeId: e.target.value })}
