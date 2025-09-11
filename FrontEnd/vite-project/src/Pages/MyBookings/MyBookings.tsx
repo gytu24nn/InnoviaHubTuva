@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react'
 // import { IMyBooking } from "./TempInterface";
+import "../../ErrorAndLoading.css"
 
 type Booking = {
   bookingId: number;
@@ -48,12 +49,17 @@ const MyBookings = () => {
     <div>
       <h2>Mina bokningar</h2>
 
-      {loading && <p>Laddar bokningar...</p>}
-      {error && <p>{error}</p>}
+      <div className="errorAndLoadingMessage-container">
+        {loading && <p className='loading-message'>Laddar bokningar...</p>}
+        {error && <p className='error-message'>{error}</p>}
 
-      {!loading && !error && bookings.length === 0 && (
-        <p>Du har inga bokningar ännu</p>
-      )}
+        {!loading && !error && bookings.length === 0 && (
+          <p>Du har inga bokningar ännu</p>
+        )}
+      </div>
+      
+
+      
 
       {!loading && bookings.length > 0 && (
         <ul>

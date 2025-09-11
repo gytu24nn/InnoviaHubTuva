@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../Booking/Resursvy.css"
+import "../../ErrorAndLoading.css"
 
 type BookingType = {
     bookingId: number;
@@ -46,17 +47,18 @@ const MyBookingsSummary = () => {
     return (
         <div className="BookingSummaryContainer">
             <h3><i className="fa-solid fa-calendar"></i>Mina bokningar</h3>
+            
+            <div className="errorAndLoadingMessage-container">
+              {loading && <p className='loading-message'>Laddar bokningar...</p>}
+              {error && <p className='error-message'>{error}</p>}
 
-            {loading && <p>Laddar bokningar</p>}
-            {error && <p>{error}</p>}
-
+            </div>
+            
             {!loading && !error && (
-                <>
-                    <p>Du har {bookings.length} bokning{bookings.length !== 1 ? "ar" : ""}</p>
-                    <Link to={"/MyBookings"}>
-                    
-                    </Link>
-                </>
+              <Link to={"/MyBookings"}>
+                <p>Du har {bookings.length} bokning{bookings.length !== 1 ? "ar" : ""}</p>
+              </Link>
+                
             )}
         </div>
     )

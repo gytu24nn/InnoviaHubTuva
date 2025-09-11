@@ -1,0 +1,27 @@
+.errorAndLoadingMessage-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
+
+.loading-message {
+    color: #3D71AF;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.error-message {
+    color: #e63946;
+    background-color: #ffe5e5;
+    border-radius: 1px solid #e63946;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    max-width: 400px;
+    text-align: center;
+    margin: 0.5rem auto;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+}
+

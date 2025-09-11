@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Resursvy.css"
 import MyBookingsSummary from "../MyBookings/MyBookingsSummary";
+import "../../ErrorAndLoading.css"
 
 type ResourceType = {
     resourceTypeId: number;
@@ -43,9 +44,9 @@ const Resursvy = () => {
                 <p id="ResourceInfoText">Välj en resurs du vill boka</p>
             </div>
             
-            <div>
-                {loading && <p>Laddar resurser...</p>}
-                {error && <p>{error}</p>} 
+            <div className="errorAndLoadingMessage-container">
+                {loading && <p className="loading-message">Laddar resurser...</p>}
+                {error && <p className="error-message">{error}</p>} 
             </div>
             
             <div id="ResourceInfo">
