@@ -3,14 +3,13 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 19px 24px 19px 24px;
+    padding: 19px 24px;
     background-color: #E4E4E4;
     border-bottom: 1px solid #ddd;
     position: relative;
     z-index: 1001;
-    padding: 19px 14px 19px 90px;
     gap: 0;
-    min-width: 350px;
+    min-width: 300px;
     
 }
 
@@ -18,12 +17,16 @@
     color: #3D71AF;
     font-family: "Hermeneus One";
     font-size: 40px;
-    font-weight: 400;
-    line-height: 1;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+
     height: auto;
     width: auto;
     z-index: 1001;
     text-decoration: none;
+    align-self: center;
+    margin-top: 2px;
 }
 
 .menu-icon {
