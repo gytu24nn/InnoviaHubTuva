@@ -1,34 +1,47 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { registerUser, signIn } from '../../Services/authService'
 
 const SignUp = () => {
-  const [email, setEmail] = useState('')
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setError(null);
     
     if (password !== confirmPassword) {
-      alert("Fel lösenord!")
+      alert("Lösenorden matchar inte");
       return
     }
 
-    console.log("Registrerad med:", { email, password }
-    // Här kan du lägga till logik för att skicka data till backend
-    )
+    try {
+      setLoading(true);
+      await registerUser(username.trim(), password);
+      await signIn(username.trim(), password);
+      navigate('/Home');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ett fel uppstod');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="signup-container">
       <div className="signup-box">
         <h2>Registrera dig</h2>
-        <form onSubmit={handleSubmit} className="signup-form">
+        {error && <div className="error-message">{error}</div>}
+        <form onSubmit={handleSubmit} className="signup-form" noValidate>
           <input 
-            type="email" 
-            placeholder="E-post" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text" 
+            placeholder="Användarnamn" 
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required 
           />
           <input 
