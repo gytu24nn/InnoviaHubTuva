@@ -27,12 +27,13 @@ namespace BackEnd.Controllers
                 .Include(b => b.Resource)
                 .Include(b => b.TimeSlot)
                 .Include(b => b.User)
-                .Select(b => new BookingDTO
+                .Select(static b => new BookingDTO
                 {
                     BookingId = b.BookingId,
                     Date = b.Date,
                     UserId = b.UserId ?? "",
                     UserEmail = b.User != null ? b.User.Email : "Okänd användare",
+                    UserName = b.User != null ? b.User.UserName : "Okänd användare",
                     ResourceId = b.ResourceId,
                     ResourceName = b.Resource != null ? b.Resource.Name : "",
                     TimeSlotId = b.TimeSlotId,
