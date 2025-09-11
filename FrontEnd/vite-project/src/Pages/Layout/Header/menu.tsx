@@ -27,7 +27,7 @@ const meny = ({isOpen}: MenuProps) => {
                     </Link>
                 </li>
                 <li>
-                    <Link className="linkMenuOption" to={"/Booking"}>
+                    <Link className="linkMenuOption" to={"/Resursvy"}>
                        <i className="fa-solid fa-star"></i>Boka resurs
                     </Link>
                 </li>
