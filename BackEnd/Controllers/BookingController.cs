@@ -127,7 +127,7 @@ namespace BackEnd.Controllers
 public async Task<IActionResult> GetAllMyBookings()
 {
     // Hämta inloggad användares Id från token
-    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)?.Trim();
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
     if (string.IsNullOrEmpty(userId))
         return Unauthorized("UserId not found in token.");

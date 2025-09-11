@@ -18,21 +18,21 @@ const meny = ({isOpen}: MenuProps) => {
             <ul>
                 <li>
                     <Link className="linkMenuOption" to={"/Admin"}>
-                        Admin panel
+                       <i className="fa-solid fa-star"></i>Admin panel
                     </Link>
                 </li>
                 <li>
                     <Link className="linkMenuOption" to={"/MyBookings"}>
-                        Mina bokningar
+                        <i className="fa-solid fa-star"></i>Mina bokningar
                     </Link>
                 </li>
                 <li>
                     <Link className="linkMenuOption" to={"/Booking"}>
-                        Boka resurs
+                       <i className="fa-solid fa-star"></i>Boka resurs
                     </Link>
                 </li>
                 <li onClick={handleLogout}>
-                    Logga ut
+                    <i className="fa-solid fa-star"></i>Logga ut
                 </li>
             </ul>
         </nav>

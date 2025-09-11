@@ -142,10 +142,12 @@ namespace BackEnd.Controllers
             return Ok(deletedResource);
         }
 
+
+
         // Hämtar alla tidsluckor
         [HttpGet("timeslots")]
         public async Task<IActionResult> GetAllTimeSlots()
-        {
+         {
             var slots = await _context.TimeSlots
                 .Select(t => new TimeSlotDTO
                 {
