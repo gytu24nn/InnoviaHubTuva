@@ -7,7 +7,9 @@ const admin = () => {
     const [newResource, setNewResource] = useState<{ resourceTypeId: string; name: string }>({ resourceTypeId: "", name: ""});
     const [editResource, setEditResource] = useState({ id: "", resourceTypeId: "", name: "" });
     const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([]);
-    const [editingResourceId, setEditingResourceId] = useState<number | null>(null);
+    const [selectedResourceType, setSelectedResourceType] = useState<number | null>(null);
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
     // Typ för en tidslucka
     type TimeSlot = {
@@ -26,7 +28,8 @@ const admin = () => {
       timeSlotId: number;
       startTime: string; 
       endTime: string;
-      userEmail:string; 
+      userEmail:string;
+      userName:string; 
     };
 
     // Typ för en resurs
@@ -47,81 +50,167 @@ const admin = () => {
     const [showResources, setShowResources] = useState(false);
     const [showAddResourceForm, setShowAddResourceForm] = useState(false);
 
-    const apiBase = "http://localhost:5099/api/admin";
+    const apiBase = "http://localhost:5099/api"; 
+    const adminApiBase = `${apiBase}/admin`;
+    const authApiBase = `${apiBase}/auth`;
+    const bookingApiBase = `${apiBase}/booking`;
 
+    // Funktion för att hämta användarens behörighet från servern
+    const checkUserRole = async () => {
+        try {
+            const response = await fetch(`${authApiBase}/me`, {
+                credentials: 'include'
+            });
+            
+            if (response.ok) {
+                const user = await response.json();
+                setIsAdmin(user.roles.includes("Admin"));
+            } else {
+                setIsAdmin(false); 
+            }
+        } catch (error) {
+            console.error("Fel vid behörighetskontroll:", error);
+            setIsAdmin(false);
+        }
+    };
+
+    // useEffect för att kontrollera behörighet vid komponentens start
+    useEffect(() => {
+        checkUserRole();
+    }, []);
+    
     // Hämta alla resurser
     const fetchResources = async () => {
-      const response = await fetch(`${apiBase}/resources`);
-      const data = await response.json();
-      setResources(data);
+        try {
+            const response = await fetch(`${adminApiBase}/resources`, { credentials: 'include' });
+            if (!response.ok) { throw new Error('Kunde inte hämta resurser.'); }
+            const data = await response.json();
+            setResources(data);
+        } catch (error) {
+            console.error("Kunde inte hämta resurser:", error);
+        }
     }
 
     // Hämta alla bokningar
     const fetchBookings = async () => {
-      const response = await fetch(`${apiBase}/bookings`);
-      const data = await response.json();
-      setBookings(data);
+        try {
+            const response = await fetch(`${adminApiBase}/bookings`, { credentials: 'include' });
+            if (!response.ok) { throw new Error('Kunde inte hämta bokningar.'); }
+            const data = await response.json();
+            setBookings(data);
+        } catch (error) {
+            console.error("Kunde inte hämta bokningar:", error);
+        }
     }
 
     const fetchResourceTypes = async () => {
-    const response = await fetch(`${apiBase}/resourcetypes`);
-    const data: ResourceType[] = await response.json();
-    setResourceTypes(data);
-};
+        try {
+            const response = await fetch(`${adminApiBase}/resourcetypes`, { credentials: 'include' });
+            if (!response.ok) { throw new Error('Kunde inte hämta resurstyper.'); }
+            const data: ResourceType[] = await response.json();
+            setResourceTypes(data);
+        } catch (error) {
+            console.error("Kunde inte hämta resurstyper:", error);
+        }
+    };
 
+    // FLYTTADE DENNA useEffect TILL TOPPEN
     useEffect(() => {
-      fetchBookings();
-      fetchResources();
-      fetchResourceTypes();
-    }, []);
+        if (isAdmin) {
+            fetchBookings();
+            fetchResources();
+            fetchResourceTypes();
+        }
+    }, [isAdmin]);
+
+    // Visa laddningsstatus medan vi väntar på behörighetskontrollen
+    if (isAdmin === null) {
+        return (
+            <div id="admin-panel">
+                <h1>Laddar behörighet...</h1>
+            </div>
+        );
+    }
+    
+    // Om användaren inte är admin, returnera ett felmeddelande
+    if (!isAdmin) {
+        return (
+            <div id="admin-panel">
+                <h1>Åtkomst nekad</h1>
+                <p>Du har inte behörighet att se denna sida.</p>
+            </div>
+        );
+    }
 
     // Skapa en ny resurs
     const createResource = async () => {
-
-          const resourceData = {
-        ...newResource,
-        resourceTypeId: parseInt(newResource.resourceTypeId, 10),
+        const resourceData = {
+            ...newResource,
+            resourceTypeId: parseInt(newResource.resourceTypeId, 10),
+        };
+        try {
+            await fetch(`${adminApiBase}/resources`, {
+                method: "POST",
+                headers:{ "Content-Type": "application/json" },
+                body: JSON.stringify(resourceData),
+                credentials: 'include'
+            });
+            setNewResource({ resourceTypeId: "", name: ""});
+            fetchResources();
+        } catch (error) {
+            console.error("Kunde inte skapa resurs:", error);
+        }
     };
 
-      await fetch(`${apiBase}/resources`, {
-        method: "POST",
-        headers:{ "Content-Type": "application/json" },
-        body: JSON.stringify(resourceData),
-      });
-
-      setNewResource({ resourceTypeId: "", name: ""});
-      fetchResources();
-    };
-
-  // Uppdatera resurs
+    // Uppdatera resurs
     const submitEditResource = async () => {
-      await fetch(`${apiBase}/resource/edit/${editResource.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          resourceTypeId: editResource.resourceTypeId,
-          name: editResource.name,
-        }),
-      });
-      setEditResource({ id: "", resourceTypeId: "", name: "" });
-      fetchResources();
+        try {
+            await fetch(`${adminApiBase}/resource/edit/${editResource.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    resourceTypeId: editResource.resourceTypeId,
+                    name: editResource.name,
+                }),
+                credentials: 'include'
+            });
+            setEditResource({ id: "", resourceTypeId: "", name: "" });
+            fetchResources();
+        } catch (error) {
+            console.error("Kunde inte uppdatera resurs:", error);
+        }
     };
 
     const deleteResource = async (id: number) => {
-
-      const userConfirmed = window.confirm("Är du säker på att du vill radera denna resurs? Detta går inte att ångra.");
-
-      if (userConfirmed){
-      await fetch(`${apiBase}/resource/${id}`, {
-        method: "DELETE",
-      });
-      fetchResources();
-      }
+        const userConfirmed = window.confirm("Är du säker på att du vill radera denna resurs? Detta går inte att ångra.");
+        if (userConfirmed){
+            try {
+                await fetch(`${adminApiBase}/resource/${id}`, {
+                    method: "DELETE",
+                    credentials: 'include'
+                });
+                fetchResources();
+            } catch (error) {
+                console.error("Kunde inte radera resurs:", error);
+            }
+        }
     };
 
-return (
-  <div id="admin-panel">
-    <h1>Admin Panel</h1>
+    // Funktion för att filtrera resurser
+    const filteredResources = resources.filter(resource => {
+        return selectedResourceType === null || resource.resourceTypeId === selectedResourceType;
+    })
+
+    // Funktion för att filtrera bokningar baserat på datum
+    const filteredBookings = bookings.filter(booking => {
+        if (!selectedDate) {
+            return true;
+        }
+        return booking.date.split('T')[0] === selectedDate;
+    });
+    return (
+        <div id="admin-panel">
+            <h1>Admin Panel</h1>
 
             {/* KNAPP FÖR ATT VISA BOKNINGAR */}
             <button className="GettingStartedButton" onClick={() => setShowBookings(!showBookings)}>
@@ -132,14 +221,23 @@ return (
             {showBookings && (
                 <div id="bookings-list">
                     <h2>Alla bokningar</h2>
+                    <div className="filter-buttons">
+                        <input
+                            type="date"
+                            value={selectedDate || ''}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                        />
+                        <button onClick={() => setSelectedDate(null)}>
+                            Visa alla
+                        </button>
+                    </div>
                     <ul id="booking-ul">
-                        {bookings.map((booking) => (
+                        {filteredBookings.map((booking) => (
                             <li key={booking.bookingId} className="booking-item">
                                 <strong>Boknings-ID:</strong> {booking.bookingId} | <strong>Resurs:</strong> {booking.resourceName} |{" "}
                                 <strong>Datum:</strong> {new Date(booking.date).toLocaleDateString()} |{" "}
                                 <strong>Tid:</strong> {booking.startTime} | <strong>Slut:</strong> {booking.endTime} |
-                                <strong>Bokad av:</strong> {booking.userEmail}
-
+                                <strong>Bokad av:</strong> {booking.userName}
                             </li>
                         ))}
                     </ul>
@@ -155,31 +253,53 @@ return (
             {showResources && (
                 <div id="resources-list">
                     <h2>Befintliga resurser</h2>
-                      <ul id="resource-ul">
-                          {resources.map((resource) => (
-                              <li key={resource.resourceId} className="resource-item">
-                                  <span className="resource-details">
-                                      <strong>ID:</strong> {resource.resourceId} | <strong>Namn:</strong> {resource.name} |{" "}
-                                      <strong>Resurstyp:</strong> {resource.resourceTypeName}
-                                  </span>
-                                  <div className="resource-actions"> {/* Ny behållare för knapparna */}
-                                      <button
-                                          className="edit-resource-btn"
-                                          onClick={() => setEditingResourceId(resource .resourceId)}
-                                      >
-                                          ✏️
-                                      </button>
-                                      <button
-                                          className="delete-resource-btn"
-                                          onClick={() => deleteResource(resource.resourceId)}
-                                      >
-                                          Radera
-                                      </button>
-                                  </div>
-                              </li>
-                          ))}
+                    {/* KNAPPAR FÖR FILTRERING */}
+                    <div className="filter-buttons">
+                        <button
+                            onClick={() => setSelectedResourceType(null)}
+                            className={selectedResourceType === null ? 'active' : ''}
+                        >
+                            Visa alla
+                        </button>
+                        {resourceTypes.map((type) => (
+                            <button
+                                key={type.resourceTypeId}
+                                onClick={() => setSelectedResourceType(type.resourceTypeId)}
+                                className={selectedResourceType === type.resourceTypeId ? 'active' : ''}
+                            >
+                                {type.name}
+                            </button>
+                        ))}
+                    </div>
+                    <ul id="resource-ul">
+                        {filteredResources.map((resource) => (
+                            <li key={resource.resourceId} className="resource-item">
+                                <span className="resource-details">
+                                    <strong>ID:</strong> {resource.resourceId} | <strong>Namn:</strong> {resource.name} |{" "}
+                                    <strong>Resurstyp:</strong> {resource.resourceTypeName}
+                                </span>
+                                <div className="resource-actions">
+                                    <button
+                                        className="edit-resource-btn"
+                                        onClick={() => setEditResource({
+                                            id: resource.resourceId.toString(),
+                                            resourceTypeId: resource.resourceTypeId.toString(),
+                                            name: resource.name
+                                        })}
+                                    >
+                                        ✏️
+                                    </button>
+                                    <button
+                                        className="delete-resource-btn"
+                                        onClick={() => deleteResource(resource.resourceId)}
+                                    >
+                                        Radera
+                                    </button>
+                                </div>
+                            </li>
+                        ))}
                     </ul>
-                </div> 
+                </div>
             )}
 
             {/* NY KNAPP FÖR ATT VISA FORMULÄR FÖR ATT LÄGGA TILL RESURS */}
@@ -197,7 +317,7 @@ return (
                         onChange={(e) => setNewResource({ ...newResource, resourceTypeId: e.target.value })}
                         id="new-resource-type-id"
                     >
-                        <option value="">Välj resurstyp</option> {/* Ett standardalternativ */}
+                        <option value="">Välj resurstyp</option>
                         {resourceTypes.map((type) => (
                             <option key={type.resourceTypeId} value={type.resourceTypeId}>
                                 {type.name}
@@ -216,8 +336,8 @@ return (
                     </button>
                 </div>
             )}
-              {/* FORMULÄR FÖR ATT REDIGERA RESURS */}
-                {editResource.id && (
+            {/* FORMULÄR FÖR ATT REDIGERA RESURS */}
+            {editResource.id && (
                 <div className="modal">
                     <div className="modal-content">
                         <h2>Redigera resurs</h2>
@@ -241,8 +361,8 @@ return (
                     </div>
                 </div>
             )}
-  </div>
-  );
+        </div>
+    );
 }
 
-export default admin
+export default admin;
