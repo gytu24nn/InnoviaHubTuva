@@ -373,6 +373,13 @@ const admin = () => {
                     </div>
                 </div>
             )}
+
+            {/* NY KNAPP FÖR ATT VISA FORMULÄR FÖR ATT LÄGGA TILL RESURS */}
+            {/* Behövs implementeras i front/backend */}
+            <button className="GettingStartedButton" >
+                 Lägg till ny resurstyp (kommer snart)
+            </button>
+            
         </div>
     );
 }
