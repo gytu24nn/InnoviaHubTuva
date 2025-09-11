@@ -1,0 +1,99 @@
+.myBookingsContainer {
+    width: auto;
+    margin: 1rem auto;
+    padding: 1rem;
+    background-color: #E4E4E4;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    min-width: 300px;
+    box-sizing: border-box;
+}
+
+.myBookingsContainer h2 {
+    color: #000;
+    font-family: "Hermeneus One";
+    font-size: 1.25rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    margin-bottom: -1rem;
+    border-bottom: 2px solid #f2f2f2;
+}
+
+.myBookingsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.myBookingsList li {
+    background-color: #f9fafb;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.myBookingsList li:hover {
+    background-color: #88b1e4;
+    transform: translateY(-2px);
+}
+
+.bookingResource {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.bookingDatetime {
+    font-size: 0.9rem;
+    color: #000;
+}
+
+.my-bookings-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #888;
+    font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .myBookingsContainer {
+    max-width: 300px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .myBookingsContainer h2 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 900px) {
+  .myBookingsContainer {
+    max-width: 500px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* 💻 Desktop */
+@media (min-width: 900px) {
+  .myBookingsContainer {
+    max-width: 700px;
+    padding: 1.5rem;
+    margin: 2rem auto;
+  }
+
+  .myBookingsContainer h2 {
+    font-size: 1.5rem;
+  }
+}

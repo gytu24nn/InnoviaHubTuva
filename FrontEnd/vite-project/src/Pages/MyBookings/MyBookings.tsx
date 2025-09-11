@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react'
 // import { IMyBooking } from "./TempInterface";
 import "../../ErrorAndLoading.css"
+import "./MyBookings.css"
 
 type Booking = {
   bookingId: number;
@@ -46,7 +47,7 @@ const MyBookings = () => {
   }, [])
 
   return (
-    <div>
+    <div className='myBookingsContainer'>
       <h2>Mina bokningar</h2>
 
       <div className="errorAndLoadingMessage-container">
@@ -54,7 +55,7 @@ const MyBookings = () => {
         {error && <p className='error-message'>{error}</p>}
 
         {!loading && !error && bookings.length === 0 && (
-          <p>Du har inga bokningar ännu</p>
+          <p className="my-bookings-empty">Du har inga bokningar ännu</p>
         )}
       </div>
       
@@ -62,11 +63,13 @@ const MyBookings = () => {
       
 
       {!loading && bookings.length > 0 && (
-        <ul>
+        <ul className='myBookingsList'>
           {bookings.map((b) => (
             <li key={b.bookingId}>
-              {b.resourceName} – {new Date(b.date).toLocaleDateString("sv-SE")}{" "}
-              ({b.startTime} - {b.endTime})
+              <span className='bookingResource'>{b.resourceName}</span>
+              <span className='bookingDatetime'>
+                {new Date(b.date).toLocaleDateString("sv-SE")} ({b.startTime} - {b.endTime})
+              </span>
             </li>
           ))}
         </ul>
