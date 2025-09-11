@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { signIn, fetchMe } from '../../Services/authService'
+import './SignIn.css'
 
 
 const SignIn = () => {
@@ -35,6 +36,12 @@ const SignIn = () => {
   return (
     <div className="signing-container">
       <div className="signing-box">
+        <h1 className="logo">
+          <Link className="logo" to={"/"}>
+              Innovia Hub
+          </Link>
+        </h1>
+
         <h2>Logga in</h2>
 
         {error && <div className="error-message">{error}</div>}

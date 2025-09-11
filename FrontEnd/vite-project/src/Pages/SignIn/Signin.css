@@ -1,0 +1,125 @@
+/* Grundläggande layout */
+.signing-container, .signup-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: #f9f9f9;
+}
+
+/* Rutor som innehåller formulären */
+.signing-box, .signup-box {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 25px;
+    background-color: #d9d9d9;
+    text-align: center;
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Rubriker */
+.signing-box h2, .signup-box h2 {
+    color: #000;
+    font-family: "Hermeneus One", sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* Formulär */
+.signing-form, .signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Inputfält */
+.signing-form input, .signup-form input {
+    padding: 0.8rem 1rem;
+    border: none;
+    border-radius: 12px;
+    background-color: #fff;
+    font-size: 1rem;
+    color: #333;
+    transition: box-shadow 0.2s ease;
+}
+
+.signing-form input:focus, .signup-form input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #3D71AF;
+}
+
+/* Knappar */
+.signing-form button, .signup-form button {
+    background-color: #3D71AF;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 1rem;
+}
+
+.signing-form button:hover, .signup-form button:hover {
+    background-color: #2a5888;
+}
+
+/* Felmeddelande */
+.error-message {
+    color: #e63946;
+    background-color: #ffe5e5;
+    border: 1px solid #e63946;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 1rem;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.signup-redirect p, .signup-container p {
+    font-size: 1rem;
+    color: #555;
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.signup-redirect a, .signup-container a {
+    color: #3D71AF;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.signup-redirect a:hover, .signup-container a:hover {
+    color: #2a5888;
+}
+
+.logo {
+    color: #3D71AF;
+    font-family: "Hermeneus One";
+    font-size: 40px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+
+    height: auto;
+    width: auto;
+    z-index: 1001;
+    text-decoration: none;
+    align-self: center;
+    margin-top: 2px;
+}
+
+.signing-box .logo, .signup-box .logo {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}

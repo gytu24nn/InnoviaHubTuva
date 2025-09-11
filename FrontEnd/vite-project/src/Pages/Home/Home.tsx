@@ -5,7 +5,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const handleGettingStartedButton = () => {
-    navigate("/Booking");
+    navigate("/Resursvy");
   }
   return (
     <div className="HomePage">

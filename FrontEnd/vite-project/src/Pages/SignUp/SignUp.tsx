@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { registerUser, signIn } from '../../Services/authService'
+import "../SignIn/Signin.css"
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -34,6 +35,11 @@ const SignUp = () => {
   return (
     <div className="signup-container">
       <div className="signup-box">
+        <h1 className="logo">
+          <Link className="logo" to={"/"}>
+            Innovia Hub
+          </Link>
+          </h1>
         <h2>Registrera dig</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit} className="signup-form" noValidate>
@@ -60,7 +66,7 @@ const SignUp = () => {
           />
           <button type="submit">Registrera</button>
         </form>
-        <p>Har du redan ett konto? <Link to="/signin">Logga in här</Link></p>
+        <p>Har du redan ett konto? <Link to="/">Logga in här</Link></p>
       </div>
     </div>
   )
