@@ -21,7 +21,11 @@ const MyBookings = () => {
   //fetch my bookings
   const fetchMyBookings = async () => {
     try {
-      const response = await fetch(`${apiBase}/mybookings`);
+      const response = await fetch(`${apiBase}/mybookings`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      
       if (!response.ok) {
         throw new Error("Något gick fel vid hämtning av bokningar.");
       }
