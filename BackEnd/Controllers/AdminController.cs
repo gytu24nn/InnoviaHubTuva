@@ -145,21 +145,30 @@ namespace BackEnd.Controllers
 
 
         // Hämtar alla tidsluckor
-        [HttpGet("timeslots")]
-        public async Task<IActionResult> GetAllTimeSlots()
-         {
-            var slots = await _context.TimeSlots
-                .Select(t => new TimeSlotDTO
-                {
-                    TimeSlotsId = t.TimeSlotsId,
-                    StartTime = t.startTime.ToString(@"hh\\:mm"),
-                    EndTime = t.endTime.ToString(@"hh\\:mm"),
-                    Duration = t.Duration
-                })
-                .ToListAsync();
+[HttpGet("timeslots")]
+public async Task<IActionResult> GetAllTimeSlots()
+{
+    try
+    {
+        var slots = await _context.TimeSlots
+            .Select(t => new TimeSlotDTO
+            {
+                TimeSlotsId = t.TimeSlotsId,
+                StartTime = t.startTime.ToString(@"hh\:mm"),
+                EndTime = t.endTime.ToString(@"hh\:mm"),
+                Duration = t.Duration
+            })
+            .ToListAsync();
 
-            return Ok(slots);
-        }
+        return Ok(slots);
+    }
+    catch (Exception ex)
+    {
+        // Log the exact error to backend console
+        Console.WriteLine($"❌ Error in GetAllTimeSlots: {ex.Message}");
+        return StatusCode(500, "Something went wrong when fetching timeslots.");
+    }
+}
 
         // Skapa en ny tidslucka
         [HttpPost("timeslots")]

@@ -53,7 +53,7 @@ useEffect(() => {
   const fetchData = async () => {
     try {
       // 🔹 1. Fetch MyBookings (temporarily without token)
-      const bookingsRes = await fetch("http://localhost:5099/api/Booking/mybookings");
+      const bookingsRes = await fetch("http://localhost:5099/api/Admin/bookings");
       if (!bookingsRes.ok) {
         throw new Error(`Failed to fetch bookings: ${bookingsRes.status}`);
       }

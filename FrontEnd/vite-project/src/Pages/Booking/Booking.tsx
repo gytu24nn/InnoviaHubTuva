@@ -17,15 +17,16 @@ const Booking = () => {
     loading,
     error,
   } = useBookingContext();
+
   const navigate = useNavigate();
 
   // Handle calendar click
   const handleDateSelect = (slotInfo: { start: Date }) => {
     setDate(slotInfo.start);
-    setTimeSlotId(null);
+    setTimeSlotId(null); // reset timeslot when new date is picked
   };
 
-  // Filter available slots by date
+  // Filter available slots by selected date
   const availableSlots = date
     ? timeSlots.filter(
         (slot) =>
@@ -46,17 +47,24 @@ const Booking = () => {
 
   // Confirm booking flow
   const handleConfirm = () => {
-    if (date && timeSlotId) {
-      navigate("/BookingConfirmed");
+    if (!date || !timeSlotId) {
+      alert("Välj ett datum och en tid innan du fortsätter.");
+      return;
     }
+    navigate("/BookingConfirmed");
   };
 
-  if (loading) return <div className="p-4 text-center">⏳ Loading...</div>;
-  if (error) return <div className="p-4 text-red-500">{error}</div>;
+  if (loading) {
+    return <div className="p-4 text-center">⏳ Laddar tider...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-500">Fel: {error}</div>;
+  }
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">Boka en tid</h1>
+    <div className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Boka en tid</h1>
 
       {/* Calendar */}
       <div className="mb-6">
@@ -64,9 +72,10 @@ const Booking = () => {
           localizer={localizer}
           selectable
           onSelectSlot={handleDateSelect}
+          defaultDate={new Date()}   // show today by default
           views={["month"]}
           style={{ height: 500 }}
-        />
+          />
       </div>
 
       {/* Slots list */}
@@ -78,7 +87,7 @@ const Booking = () => {
 
           {Object.entries(groupedSlots).map(([label, slots]) => (
             <div key={label} className="mb-4">
-              <h3 className="font-medium">{label}</h3>
+              <h3 className="font-medium mb-1">{label}</h3>
               <div className="flex flex-wrap gap-2">
                 {slots.length === 0 ? (
                   <p className="text-sm text-gray-500">Inga tider</p>
@@ -87,9 +96,9 @@ const Booking = () => {
                     <button
                       key={slot.timeSlotsId}
                       onClick={() => setTimeSlotId(slot.timeSlotsId)}
-                      className={`px-4 py-2 rounded-lg border ${
+                      className={`px-4 py-2 rounded-lg border transition ${
                         timeSlotId === slot.timeSlotsId
-                          ? "bg-blue-500 text-white"
+                          ? "bg-blue-600 text-white"
                           : "bg-gray-100 hover:bg-gray-200"
                       }`}
                     >
@@ -102,17 +111,19 @@ const Booking = () => {
           ))}
 
           {/* Confirm button */}
-          <button
-            onClick={handleConfirm}
-            disabled={!timeSlotId}
-            className={`mt-6 px-6 py-2 rounded-lg text-white ${
-              timeSlotId
-                ? "bg-green-500 hover:bg-green-600"
-                : "bg-gray-400 cursor-not-allowed"
-            }`}
-          >
-            Klar
-          </button>
+          <div className="mt-6">
+            <button
+              onClick={handleConfirm}
+              disabled={!timeSlotId}
+              className={`w-full py-3 rounded-lg text-white font-bold ${
+                timeSlotId
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-gray-400 cursor-not-allowed"
+              }`}
+            >
+              Klar (Boka)
+            </button>
+          </div>
         </div>
       )}
     </div>
