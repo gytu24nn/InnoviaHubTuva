@@ -53,7 +53,7 @@ useEffect(() => {
   const fetchData = async () => {
     try {
       // 🔹 1. Fetch MyBookings (temporarily without token)
-      const bookingsRes = await fetch("http://localhost:5099/api/Admin/bookings");
+      const bookingsRes = await fetch("http://localhost:5099/api/user/public-bookings");
       if (!bookingsRes.ok) {
         throw new Error(`Failed to fetch bookings: ${bookingsRes.status}`);
       }
@@ -61,7 +61,7 @@ useEffect(() => {
       setBookings(bookingsData);
 
       // 🔹 2. Fetch TimeSlots
-      const timeSlotsRes = await fetch("http://localhost:5099/api/Admin/timeslots");
+      const timeSlotsRes = await fetch("http://localhost:5099/api/user/timeslots");
       if (!timeSlotsRes.ok) {
         throw new Error(`Failed to fetch timeslots: ${timeSlotsRes.status}`);
       }
