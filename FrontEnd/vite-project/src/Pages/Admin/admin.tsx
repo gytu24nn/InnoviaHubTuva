@@ -25,7 +25,7 @@ const admin = () => {
       startTime: string; 
       endTime: string;
       userEmail:string;
-      userName:string; 
+    //   userName:string; 
     };
 
     // Typ för en resurs
@@ -102,7 +102,7 @@ const admin = () => {
 
     const fetchResourceTypes = async () => {
         try {
-            const response = await fetch(`${adminApiBase}/resourcetypes`, { credentials: 'include' });
+            const response = await fetch(`${apiBase}/resource/resourcetypes`, { credentials: 'include' });
             if (!response.ok) { throw new Error('Kunde inte hämta resurstyper.'); }
             const data: ResourceType[] = await response.json();
             setResourceTypes(data);
@@ -250,7 +250,7 @@ const admin = () => {
                                 <strong>Boknings-ID:</strong> {booking.bookingId} | <strong>Resurs:</strong> {booking.resourceName} |{" "}
                                 <strong>Datum:</strong> {new Date(booking.date).toLocaleDateString()} |{" "}
                                 <strong>Tid:</strong> {booking.startTime} | <strong>Slut:</strong> {booking.endTime} |
-                                <strong>Bokad av:</strong> {booking.userName} 
+                                <strong>Bokad av:</strong> {booking.userEmail} 
                             </li>
                         ))}
                     </ul>
