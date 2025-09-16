@@ -17,12 +17,16 @@ const Booking = () => {
     bookings,
     loading,
     error,
+    resource,
+    resourceId,
+    setResourceId
   } = useBookingContext();
 
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
-  const resourceId = searchParams.get("resourceId");
+  const resourceTypeIdParam = searchParams.get("resourceTypeId");
+  const resourceTypeId = resourceTypeIdParam ? Number(resourceTypeIdParam) : null;
   const resourceName = searchParams.get("resourceName");
 
   // Handle calendar click
@@ -40,12 +44,27 @@ const Booking = () => {
             (b) =>
               new Date(b.date).toLocaleDateString() === date.toLocaleDateString() &&
               b.timeSlotId === slot.timeSlotsId &&
-              String(b.resourceId) === String(resourceId)
+              b.resourceTypeId === resourceTypeId
           )
       )
     : [];
 
     console.log("Available slots:", availableSlots);
+
+  const availableRescources = date 
+    ? resource.filter(
+      (r) => 
+        (!resourceName || r.type === resourceName ) &&
+
+        !bookings.some(
+          (b) => 
+            new Date(b.date).toLocaleDateString() === date.toLocaleDateString() &&
+            b.timeSlotId === timeSlotId &&
+            b.resourceId === r.resourcesId
+        )
+    )
+    : [];
+    console.log("Available resource:", availableRescources);
 
   // Group slots by duration
   const groupedSlots = {
@@ -118,6 +137,8 @@ const handleConfirm = async () => {
           />
       </div>
 
+      
+
       {/* Slots list */}
       {date && (
         <div className="mt-4">
@@ -149,6 +170,26 @@ const handleConfirm = async () => {
               </div>
             </div>
           ))}
+          
+          <div>
+            <label className="">Välj resurs:</label>
+            <select
+              value={resourceId ?? ""}
+              onChange={(e) => setResourceId(Number(e.target.value))}
+              className="">
+
+                <option value="" disabled>
+                  -- Välj en resurs -- 
+                </option>
+
+                {availableRescources.map((r) => (
+                  <option key={r.resourcesId} value={r.resourcesId}>
+                    {r.name}
+                  </option>
+                ))}
+
+              </select>
+          </div>
 
           {/* Confirm button */}
           <div className="mt-6">
