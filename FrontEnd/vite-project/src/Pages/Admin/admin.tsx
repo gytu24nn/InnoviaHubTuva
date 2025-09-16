@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Admin.css"
 import "../../ErrorAndLoading.css"
+import { se } from "date-fns/locale";
 
 const admin = () => {
     const [resources, setResources] = useState<Resource[]>([]);
@@ -13,6 +14,12 @@ const admin = () => {
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const [ntTitle, setNtTitle] = useState("");
+    const [ntMessage, setNtMessage] = useState("");
+    const [ntUserId, setNtUserId] = useState("");
+    const [ntStatus, setNtStatus] = useState("Info");
+    const [ntLoading, setNtLoading] = useState(false);
 
     // Typ för en bokning
     type Booking = {
@@ -46,7 +53,7 @@ const admin = () => {
     const [showResources, setShowResources] = useState(false);
     const [showAddResourceForm, setShowAddResourceForm] = useState(false);
 
-    const apiBase = "http://localhost:5099/api"; 
+    const apiBase = "/api"; 
     const adminApiBase = `${apiBase}/admin`;
     const authApiBase = `${apiBase}/auth`;
 
@@ -124,6 +131,42 @@ const admin = () => {
           fetchResourceTypes();
       }
     }, [isAdmin]);
+
+    // Skicka notis
+    const sendNotification = async (toUserId?: string, quickMessage?: string) => {
+        setNtStatus("");
+        const title = ntTitle.trim() || "Meddelande från admin";
+        const message = (quickMessage ?? ntMessage).trim();
+        const userId = (toUserId ?? ntUserId).trim();
+
+        if (!message) {
+            setNtStatus("Meddelande kan inte vara tomt.");
+            return;
+        }
+
+        setNtLoading(true);
+        try {
+            const response = await fetch(`${adminApiBase}/notify`, {
+                method: "POST",
+                credentials: 'include',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, message, userId: userId || null })
+            });
+            if (!response.ok) {
+                throw new Error("Kunde inte skicka notis.");
+            }
+
+            setNtStatus(`skickat ${userId ? `till ${userId}` : "till alla"}`);
+            setNtTitle("");
+            setNtMessage("");
+            if (!toUserId)  setNtUserId("");
+            } catch (e: any) {
+                setNtStatus(e?.message ?? "Något gick fel");
+            } finally {
+                setNtLoading(false);
+        }
+    };
+    
 
     // Skapa en ny resurs
     const createResource = async () => {
@@ -379,6 +422,35 @@ const admin = () => {
             <button className="GettingStartedButton" >
                  Lägg till ny resurstyp (kommer snart)
             </button>
+
+            {/* FORMULÄR FÖR ATT SKICKA NOTIS */}
+            <section className="notification-panel">
+                <h2>Skicka notis</h2>
+                <div className="notification-form">
+                    <input
+                        type="text"
+                        placeholder="Titel"
+                        value={ntTitle}
+                        onChange={(e) => setNtTitle(e.target.value)}
+                    />
+                    <textarea
+                        placeholder="Meddelande"
+                        rows={3}
+                        value={ntMessage}
+                        onChange={(e) => setNtMessage(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Användar-ID (lämna tomt för alla)"
+                        value={ntUserId}
+                        onChange={(e) => setNtUserId(e.target.value)}
+                    />
+                    <button className="GettingStartedButton" onClick={() => sendNotification()} disabled={ntLoading}>
+                        {ntLoading ? "Skickar..." : "Skicka notis"}
+                    </button>
+                    {ntStatus && <p className="status-message">{ntStatus}</p>}
+                </div>
+            </section>
             
         </div>
     );

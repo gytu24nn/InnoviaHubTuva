@@ -157,5 +157,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<BookingHub>("/BookingHub");
+app.MapHub<NotificationHub>("/NotificationHub");
 
 app.Run();

@@ -12,11 +12,16 @@ export default defineConfig({
         changeOrigin: true,
       },
       // SignalR
-       '/hubs': {
+       '/NotificationHub': {
         target: 'http://localhost:5099',
         ws: true,
         changeOrigin: true,
       },
+      '/BookingHub': {
+        target: 'http://localhost:5099',
+        ws: true,
+        changeOrigin: true,
     }
+  }
   }
 })

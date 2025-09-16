@@ -3,12 +3,14 @@ import Header from "./Header/Header";
 import { Outlet } from "react-router-dom";
 import "./Footer&Layout.css";
 import Footer from "./Footer";
+import NotficationListener from "../../Components/NotficationListener";
 
 const Layout = () => {
     const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="layout-container">
+        <NotficationListener />
         <header>
             <Header />
         </header>
