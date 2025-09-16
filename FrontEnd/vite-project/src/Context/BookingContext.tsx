@@ -13,6 +13,7 @@ export interface Booking {
   startTime: string;
   endTime: string;
   userEmail?: string;
+  resourceTypeId: number;
 }
 
 // TimeSlot from backend (TimeSlotDTO)
@@ -21,6 +22,13 @@ export interface TimeSlot {
   startTime: string; // "HH:mm"
   endTime: string;   // "HH:mm"
   duration: number;
+}
+
+export interface Resource {
+  resourcesId: number;
+  name: string;
+  resourceTypeId: number;
+  type: string;
 }
 
 interface BookingContextType {
@@ -35,6 +43,7 @@ interface BookingContextType {
   timeSlots: TimeSlot[];
   loading: boolean;
   error: string | null;
+  resource: Resource[]
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -46,6 +55,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [resource, setResource] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,6 +69,13 @@ useEffect(() => {
       }
       const bookingsData: Booking[] = await bookingsRes.json();
       setBookings(bookingsData);
+
+      const resourcesRes = await fetch("http://localhost:5099/api/Resource/available");
+      if(!bookingsRes.ok) {
+        throw new Error(`Failed to fetch resources: ${resourcesRes.status}`);
+      }
+      const resourcesData: Resource[] = await resourcesRes.json();
+      setResource(resourcesData)
 
       // 🔹 2. Fetch TimeSlots
       const timeSlotsRes = await fetch("http://localhost:5099/api/user/timeslots");
@@ -113,6 +130,7 @@ useEffect(() => {
         timeSlots,
         loading,
         error,
+        resource
       }}
     >
       {children}
