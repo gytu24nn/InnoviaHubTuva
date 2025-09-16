@@ -46,6 +46,30 @@ const MyBookings = () => {
     fetchMyBookings();
   }, [])
 
+  // avboka en bokning
+  const cancelBooking = async (bookingId: number) => {
+    if (!window.confirm("Är du säker på att du vill avboka denna bokning?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiBase}/${bookingId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error("Något gick fel vid avbokning.");
+      }
+
+      // ta bort bokningen ur state så UI uppdateras direkt
+      setBookings(prev => prev.filter(b => b.bookingId !== bookingId));
+
+    } catch (err) {
+      alert((err as Error).message);
+    }
+  };
+
   return (
     <div className='myBookingsContainer'>
       <h2>Mina bokningar</h2>
@@ -70,6 +94,13 @@ const MyBookings = () => {
               <span className='bookingDatetime'>
                 {new Date(b.date).toLocaleDateString("sv-SE")} ({b.startTime} - {b.endTime})
               </span>
+
+              <button
+              className='cancelBtn'
+              onClick={() => cancelBooking(b.bookingId)}
+              >
+                Avboka
+              </button>
             </li>
           ))}
         </ul>
