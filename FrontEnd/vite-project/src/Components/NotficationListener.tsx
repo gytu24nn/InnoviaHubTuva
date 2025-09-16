@@ -1,4 +1,5 @@
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import "./NotificationsListener.css"
 import * as signalR from "@microsoft/signalr";
 
 type Notif = { title: string; message: string; sentAt?: string; id: string };
@@ -23,47 +24,57 @@ export default function NotificationListener() {
         }, 10000);
     }); 
 
+    const bookingConn = new signalR.HubConnectionBuilder()
+        .withUrl("/BookingHub", { withCredentials: true })
+        .withAutomaticReconnect()
+        .build();
+    
+    bookingConn.on("BookingCreated", (booking) => {
+        const id = crypto.randomUUID();
+        const notif: Notif = {
+            id,
+            title: "Ny bokning",
+            message: `${booking.resourceName} bokades ${new Date(booking.date).toLocaleDateString("sv-SE")} (${booking.startTime} - ${booking.endTime})`
+        };
+        setItems((prev) => [notif, ...prev]);
+        setTimeout(() => {
+            setItems((prev) => prev.filter((x) => x.id !== id));
+        }, 10000);
+    });
+
+    bookingConn.on("BookingCancelled", (booking) => {
+        const id = crypto.randomUUID();
+        const notif: Notif = {
+            id,
+            title: "Avbokning",
+            message: `${booking.resourceName} avbokades ${new Date(booking.date).toLocaleDateString("sv-SE")} (${booking.startTime} - ${booking.endTime})`
+        };
+        setItems((prev) => [notif, ...prev]);
+        setTimeout(() => {
+            setItems((prev) => prev.filter((x) => x.id !== id));
+        }, 10000);
+    });
+
+    bookingConn.start().catch((e) => console.error("BookingHub connection error:", e));
     conn.start().catch((e) => console.error("SignalR connection error:", e));
     connRef.current = conn;
 
-    return () => {conn.stop(); };
+    return () => {
+        bookingConn.stop();
+        conn.stop(); };
     }, []);
 
     if (items.length === 0) return null;
 
     return (
-        <div style={containerStyle}>
+        <div className="toast-container">
             {items.map((n) => (
-                <div key={n.id} style={toastStyle} role="status" aria-live="polite">
-                    <strong style={{ display: "block", marginBottom: 4 }}>{n.title}</strong>
-                    <div>{n.message}</div>
-                    {n.sentAt && (
-                        <small style={{ opacity: 0.7 }}>
-                        {new Date(n.sentAt).toLocaleString("sv-SE")}
-                        </small>
-                    )}
-                </div>
+            <div key={n.id} className={`toast info`} role="status" aria-live="polite">
+                <strong>{n.title}</strong>
+                <div>{n.message}</div>
+                {n.sentAt && <small>{new Date(n.sentAt).toLocaleString("sv-SE")}</small>}
+            </div>
             ))}
         </div>
     );
 }
-
-const containerStyle: React.CSSProperties = {
-    position: "fixed",
-    right: 16,
-    top: 16,
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    zIndex: 9999,
-};
-
-const toastStyle: React.CSSProperties = {
-    background: "white",
-    color: "black",
-    padding: "10px 12px",
-    borderRadius: 8,
-    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-    minWidth: 260,
-    maxWidth: 360
-};
