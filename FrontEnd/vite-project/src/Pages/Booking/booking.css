@@ -1,0 +1,236 @@
+.booking-container {
+    background-color: #ededed;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 1rem 0.5rem;
+    margin: 1rem 0.2rem;
+    min-width: 98vw;
+}
+
+.booking-title {
+    font-family: "Hermeneus One" serif;
+    font-size: 1.5rem;
+    color: #3D71AF;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.booking-calender {
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.booking-slots-group {
+    margin-bottom: 1rem;
+}
+
+.booking-slots-label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: #222;
+}
+
+.booking-slot-btn {
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    background-color: #f5f6fa;
+    color: #222;
+    transition: background 0.2s color 0.2s;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    padding: 0.5rem 1rem;
+    margin: 0.3rem;
+    cursor: pointer;
+}
+
+.booking-slot-btn.selected, 
+.booking-slot-btn.active {
+    background-color: #3D71AF;
+    color: #fff;
+}
+
+.booking-slot-btn:hover {
+    background: #e4e4e4;
+}
+
+.booking-resource-select {
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    font-size: 1rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0.8rem;
+    background-color: #fff;
+    color: #222;
+    outline: none;
+    transition: border 0.2s;
+    width: 100%;
+}
+
+.booking-resource-select:focus {
+    border: 1.5px solid #3D71AF;
+}
+
+.booking-map-btn {
+    background-color: #3D71AF;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: background 0.2s;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: "Hermeneus One", serif;
+}
+
+.booking-map-btn:hover {
+    background-color: #285080;
+}
+
+.booking-confirm-btn {
+    background-color: #3D71AF;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: "Hermeneus One", serif;
+    font-weight: 700;
+    margin-top: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    transition: background 0.2s;
+    padding: 1rem;
+    cursor: pointer;
+}
+
+.booking-confirm-btn:disabled,
+.booking-confirm-btn.bg-gray-400 {
+    background: #b0b0b0;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.booking-confirm-btn:not(:disabled):hover {
+    background-color: #285080;
+}
+
+.booking-map-modal-overlay{
+    position: fixed;
+    inset: 0;
+    background-color: rgba(30, 40, 60, 0.25);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.booking-map-modal {
+    background-color: #fff;
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.018);
+    max-width: 98vw;
+    max-width: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.booking-close-map-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #3D71AF;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.3rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.booking-close-map-btn:hover {
+    background-color: #285080;
+}
+
+
+.booking-office-map-img {
+    max-width: 90vw;
+    max-height: 60vh;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-top: 0.5rem;
+}
+
+.booking-slot-btn.booked {
+    background-color: #ff6b6b;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+@media (min-width: 600px) {
+    .booking-container {
+        border-radius: 20px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        padding: 2rem 1.5rem;
+        margin: 2rem auto;
+        max-width: 600px;
+    }
+    .booking-title {
+        font-size: 1.8rem;
+    }
+    .booking-calender {
+        border-radius: 16px;
+        padding: 1rem;
+    }
+    .booking-map-modal {
+        border-radius: 18px;
+        padding: 1.5rem;
+        max-width: 80vw;
+    }
+    .booking-office-map-img {
+        max-width: 70vw;
+        max-height: 60vh;
+    }
+}
+
+@media (min-width: 900px) {
+    .booking-container {
+        border-radius: 24px; 
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        padding: 2.5rem 2.5rem;
+        margin: 3rem auto;
+        max-width: 420px; 
+    }
+    .booking-title {
+        font-size: 2rem;
+    }
+    .booking-calender {
+        border-radius: 18px;
+        padding: 1.5rem;
+    }
+    .booking-map-modal {
+        border-radius: 22px;
+        padding: 2rem;
+        max-width: 90vw;
+    }
+    .booking-office-map-img {
+        max-width: 80vw;
+        min-height: 70vh;
+    }
+}

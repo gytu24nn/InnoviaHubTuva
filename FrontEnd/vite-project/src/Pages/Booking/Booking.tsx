@@ -4,6 +4,10 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import {useSearchParams} from "react-router-dom";
+import KontorsLayout from "../../../public/img/Kontorslayout.png"
+import { useState } from "react";
+import "./booking.css"
+import "../../ErrorAndLoading.css"
 
 const localizer = momentLocalizer(moment);
 
@@ -22,13 +26,21 @@ const Booking = () => {
     setResourceId
   } = useBookingContext();
 
+  const resourceColors: Record<string, string> = {
+    "Mötesrum": "#B5E7AE",
+    "Skrivbord": "#FFEE99",
+    "VR": "#A6CBF5",
+    "AI": "#D6A8F2"
+  }
+
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
   const resourceTypeIdParam = searchParams.get("resourceTypeId");
   const resourceTypeId = resourceTypeIdParam ? Number(resourceTypeIdParam) : null;
   const resourceName = searchParams.get("resourceName");
-
+  const [showMap, setShowMap] = useState(false);
+  
   // Handle calendar click
   const handleDateSelect = (slotInfo: { start: Date }) => {
     console.log("SlotInfo från kalender:", slotInfo);
@@ -65,6 +77,8 @@ const Booking = () => {
     )
     : [];
     console.log("Available resource:", availableRescources);
+    const selectedResource = availableRescources.find((r) => r.resourcesId === resourceId);
+    const selecedType = selectedResource?.type;
 
   // Group slots by duration
   const groupedSlots = {
@@ -109,19 +123,19 @@ const handleConfirm = async () => {
 };
 
   if (loading) {
-    return <div className="p-4 text-center">⏳ Laddar tider...</div>;
+    return <div className="loading-message">⏳ Laddar tider...</div>;
   }
 
   if (error) {
-    return <div className="p-4 text-red-500">Fel: {error}</div>;
+    return <div className="error-message">Fel: {error}</div>;
   }
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Boka en tid för {resourceName}</h1>
+    <div className="booking-container">
+      <h1 className="booking-title">Boka en tid för {resourceName}</h1>
 
       {/* Calendar */}
-      <div className="mb-6">
+      <div className="booking-calender">
         <Calendar
           localizer={localizer}
           selectable 
@@ -129,7 +143,6 @@ const handleConfirm = async () => {
             onDrillDown={date => {
             setDate(date);
             setTimeSlotId(null);
-            console.log("DrillDown date:", date);
           }}
           defaultDate={new Date()}   // show today by default
           views={["month"]}
@@ -141,27 +154,23 @@ const handleConfirm = async () => {
 
       {/* Slots list */}
       {date && (
-        <div className="mt-4">
-          <h2 className="text-lg font-semibold mb-2">
+        <div>
+          <h2 className="booking-slots-label">
             Tillgängliga tider för {date.toDateString()}
           </h2>
 
           {Object.entries(groupedSlots).map(([label, slots]) => (
-            <div key={label} className="mb-4">
-              <h3 className="font-medium mb-1">{label}</h3>
-              <div className="flex flex-wrap gap-2">
+            <div key={label} className="booking-slots-group">
+              <h3 className="booking-slots-label">{label}</h3>
+              <div>
                 {slots.length === 0 ? (
-                  <p className="text-sm text-gray-500">Inga tider</p>
+                  <p className="booking-message">Inga tider</p>
                 ) : (
                   slots.map((slot) => (
                     <button
                       key={slot.timeSlotsId}
                       onClick={() => setTimeSlotId(slot.timeSlotsId)}
-                      className={`px-4 py-2 rounded-lg border transition ${
-                        timeSlotId === slot.timeSlotsId
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-100 hover:bg-gray-200"
-                      }`}
+                      className={`booking-slot-btn${timeSlotId === slot.timeSlotsId ? " selected" : ""}`}
                     >
                       {slot.startTime} - {slot.endTime}
                     </button>
@@ -171,12 +180,14 @@ const handleConfirm = async () => {
             </div>
           ))}
           
-          <div>
-            <label className="">Välj resurs:</label>
-            <select
-              value={resourceId ?? ""}
-              onChange={(e) => setResourceId(Number(e.target.value))}
-              className="">
+          {/*välj en resurs*/}
+            <label>Välj resurs:</label>
+            <div>
+              <select 
+                value={resourceId ?? ""}
+                onChange={(e) => setResourceId(Number(e.target.value))}
+                className="booking-resource-select"
+              >
 
                 <option value="" disabled>
                   -- Välj en resurs -- 
@@ -189,23 +200,44 @@ const handleConfirm = async () => {
                 ))}
 
               </select>
-          </div>
+              {/*Visa färgprick för vald resurs*/}
+              {resourceId && (
+                <span
+                  className="resource-color-dot"
+                  style={{
+                    backgroundColor: selecedType ? resourceColors[selecedType] : "#ccc"
+                  }}
+              
+              />
+              
+              )}
+            </div>
+            
+      
+
+          <button className="booking-map-btn" onClick={() => setShowMap(true)}>
+            Visa kontorslayout
+          </button>
+
+          {/*Karta över kontorslayout*/}
+          {showMap && (
+            <div className="booking-map-modal-overlay" onClick={() => setShowMap(false)}>
+              <div className="booking-map-modal" onClick={e => e.stopPropagation()}>
+                <button className="booking-close-map-btn" onClick={() => setShowMap(false)}>stäng</button>
+                <img src={KontorsLayout} alt="Kontorslayout" className="booking-office-map-img" />
+              </div>              
+            </div>
+          )}
 
           {/* Confirm button */}
-          <div className="mt-6">
             <button
               onClick={handleConfirm}
               disabled={!timeSlotId}
-              className={`w-full py-3 rounded-lg text-white font-bold ${
-                timeSlotId
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-gray-400 cursor-not-allowed"
-              }`}
+              className="booking-confirm-btn"
             >
-              Klar (Boka)
+              Boka
             </button>
           </div>
-        </div>
       )}
     </div>
   );
