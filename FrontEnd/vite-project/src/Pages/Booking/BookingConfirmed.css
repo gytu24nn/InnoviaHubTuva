@@ -23,7 +23,7 @@
 
 /* Green check icon */
 .ConfirmedCheck {
-    color: #16a34a; /* green-600 */
+    color: #1fc25b; /* green-600 */
     width: 100px;
     height: 100px;
     margin: 0 auto 1rem;
@@ -68,8 +68,8 @@
 
 /* Back button */
 .ConfirmedButton {
-    background-color: #eef4ff;
-    color: #3D71AF;
+    background-color: #3D71AF;
+    color: #eef4ff;
     font-weight: 600;
     padding: 0.8rem 1.5rem;
     border-radius: 15px;
@@ -80,7 +80,7 @@
 }
 
 .ConfirmedButton:hover {
-    background-color: #d8e7ff;
+    background-color: #1e4b81;
     transform: translateY(-2px);
 }
 

@@ -70,12 +70,12 @@ const BookingConfirmed = () => {
           </p>
 
           <p className="ConfirmedMessage">
-            Tack för din bokning! Du kommer även att få en bekräftelse via e-post.
+            Tack för din bokning! Du kan nu se den i mina bokningar och där kan du avboka om du får förhinder.
           </p>
         </div>
 
         {/* Back button */}
-        <button className="ConfirmedButton" onClick={() => navigate("/")}>
+        <button className="ConfirmedButton" onClick={() => navigate("/Home")}>
           Tillbaka
         </button>
       </div>
