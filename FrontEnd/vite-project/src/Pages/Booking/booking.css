@@ -24,6 +24,23 @@
     margin-bottom: 1rem;
 }
 
+/* Style för utgråade, icke-klickbara datum */
+.rbc-past-day {
+  background-color: #f0f0f0; 
+  color: #ccc; 
+  cursor: not-allowed; 
+}
+
+/* Style för det valt datum */
+.rbc-selected-day {
+  background-color: #3D71AF;
+  font-weight: bold;
+}
+
+.rbc-past-day:hover {
+  cursor: not-allowed;
+}
+
 .booking-slots-group {
     margin-bottom: 1rem;
 }
