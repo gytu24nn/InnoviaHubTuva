@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Admin.css"
 import "../../ErrorAndLoading.css"
-import { se } from "date-fns/locale";
 
 const admin = () => {
     const [resources, setResources] = useState<Resource[]>([]);
@@ -20,6 +19,7 @@ const admin = () => {
     const [ntUserId, setNtUserId] = useState("");
     const [ntStatus, setNtStatus] = useState("Info");
     const [ntLoading, setNtLoading] = useState(false);
+    const [showNotificationForm, setShowNotificationForm] = useState(false);
 
     // Typ för en bokning
     type Booking = {
@@ -391,6 +391,12 @@ const admin = () => {
                     </button>
                 </div>
             )}
+
+            {/* KNAPP FÖR ATT VISA FORMULÄR FÖR ATT SKICKA NOTIS */}
+            <button className="GettingStartedButton" onClick={() => setShowNotificationForm(!showNotificationForm)}>
+                {showNotificationForm ? "Dölj notisformulär" : "Skicka notis"}
+            </button>
+
             {/* FORMULÄR FÖR ATT REDIGERA RESURS */}
             {editResource.id && (
                 <div className="modal">
@@ -417,13 +423,8 @@ const admin = () => {
                 </div>
             )}
 
-            {/* NY KNAPP FÖR ATT VISA FORMULÄR FÖR ATT LÄGGA TILL RESURS */}
-            {/* Behövs implementeras i front/backend */}
-            <button className="GettingStartedButton" >
-                 Lägg till ny resurstyp (kommer snart)
-            </button>
-
             {/* FORMULÄR FÖR ATT SKICKA NOTIS */}
+            {showNotificationForm && (
             <section className="notification-panel">
                 <h2>Skicka notis</h2>
                 <div className="notification-form">
@@ -451,7 +452,13 @@ const admin = () => {
                     {ntStatus && <p className="status-message">{ntStatus}</p>}
                 </div>
             </section>
-            
+            )}
+        
+            {/* NY KNAPP FÖR ATT VISA FORMULÄR FÖR ATT LÄGGA TILL RESURS */}
+            {/* Behövs implementeras i front/backend */}
+            <button className="GettingStartedButton" >
+                 Lägg till ny resurstyp (kommer snart)
+            </button>
         </div>
     );
 }
