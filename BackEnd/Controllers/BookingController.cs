@@ -86,6 +86,34 @@ namespace BackEnd.Controllers
             return CreatedAtAction(nameof(CreateBooking), new { id = result.BookingId }, result);
         }
 
+        // Get a single booking by ID (for BookingConfirmed page)
+        [HttpGet("{id}")]
+        // [Authorize] // uncomment later if you want to restrict
+        public async Task<IActionResult> GetBookingById(int id)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.Resource)
+                .Include(b => b.TimeSlot)
+                .FirstOrDefaultAsync(b => b.BookingId == id);
+
+            if (booking == null)
+                return NotFound(new { Message = $"Booking with id {id} not found" });
+
+            var result = new BookingDTO
+            {
+                BookingId = booking.BookingId,
+                Date = booking.Date,
+                UserId = booking.UserId ?? "",
+                ResourceId = booking.ResourceId,
+                ResourceName = booking.Resource?.Name ?? "",
+                TimeSlotId = booking.TimeSlotId,
+                StartTime = booking.TimeSlot?.startTime.ToString(@"hh\:mm") ?? "",
+                EndTime = booking.TimeSlot?.endTime.ToString(@"hh\:mm") ?? ""
+            };
+
+            return Ok(result);
+        } 
+
         //Endpoint för att ta bort en bokning ur databasen med dess id, vet inte om vi ska
         // använda denna, eller om vi ska sätta en "avbokad" istället för att admin ska kunna
         // se bokningar som blivit avbokade.
