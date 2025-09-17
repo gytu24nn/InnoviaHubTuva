@@ -8,6 +8,7 @@ import KontorsLayout from "../../../public/img/Kontorslayout.png"
 import { useState } from "react";
 import "./booking.css"
 import "../../ErrorAndLoading.css"
+import { da } from "date-fns/locale";
 
 const localizer = momentLocalizer(moment);
 
@@ -49,19 +50,46 @@ const Booking = () => {
   };
 
   // Filter available slots by selected date
-  const availableSlots = date
-    ? timeSlots.filter(
-        (slot) =>
-          !bookings.some(
-            (b) =>
-              new Date(b.date).toLocaleDateString() === date.toLocaleDateString() &&
-              b.timeSlotId === slot.timeSlotsId &&
-              b.resourceTypeId === resourceTypeId
-          )
-      )
-    : [];
+  // const availableSlots = date
+  //   ? timeSlots.filter(
+  //       (slot) =>
+  //         !bookings.some(
+  //           (b) =>
+  //             new Date(b.date).toLocaleDateString() === date.toLocaleDateString() &&
+  //             b.timeSlotId === slot.timeSlotsId &&
+  //             b.resourceTypeId === resourceTypeId
+  //         )
+  //     )
+  //   : [];
 
-    console.log("Available slots:", availableSlots);
+
+    //console.log("Available slots:", availableSlots);
+
+  function parseTime(timeStr: string, date: Date): Date {
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes)
+  }
+
+  const slotsForDay = date && resourceId 
+    ? timeSlots.map((slots) => {
+      const isBooked = bookings.some((b) => {
+        if(b.resourceId !== resourceId ) return false; 
+
+        const bookingDate = new Date(b.date);
+        if(bookingDate.toDateString() !== date.toDateString()) return false; 
+
+        const slotStart = parseTime(slots.startTime, date);
+        const slotEnd = parseTime(slots.endTime, date);
+        const bookingStart = parseTime(b.startTime, date);
+        const bookingEnd = parseTime(b.endTime, date);
+
+        return slotStart < bookingEnd && slotEnd > bookingStart;
+
+      })
+
+    return{...slots, isBooked}
+  })
+  : [];
 
   const availableRescources = date 
     ? resource.filter(
@@ -75,16 +103,16 @@ const Booking = () => {
             b.resourceId === r.resourcesId
         )
     )
-    : [];
-    console.log("Available resource:", availableRescources);
-    const selectedResource = availableRescources.find((r) => r.resourcesId === resourceId);
+    : resource;
+
+    const selectedResource = resource.find((r) => r.resourcesId === resourceId);
     const selecedType = selectedResource?.type;
 
   // Group slots by duration
   const groupedSlots = {
-    "2h": availableSlots.filter((s) => s.duration === 2),
-    "4h": availableSlots.filter((s) => s.duration === 4),
-    "8h": availableSlots.filter((s) => s.duration === 8),
+    "2h": slotsForDay.filter((s) => s.duration === 2),
+    "4h": slotsForDay.filter((s) => s.duration === 4),
+    "8h": slotsForDay.filter((s) => s.duration === 8),
   };
 
   // Confirm booking flow
@@ -169,10 +197,12 @@ const handleConfirm = async () => {
                   slots.map((slot) => (
                     <button
                       key={slot.timeSlotsId}
-                      onClick={() => setTimeSlotId(slot.timeSlotsId)}
-                      className={`booking-slot-btn${timeSlotId === slot.timeSlotsId ? " selected" : ""}`}
+                      onClick={() => !slot.isBooked && setTimeSlotId(slot.timeSlotsId)}
+                      disabled={slot.isBooked}
+                      className={`booking-slot-btn${timeSlotId === slot.timeSlotsId ? " selected" : ""} ${slot.isBooked ? " booked" : ""}`}
                     >
                       {slot.startTime} - {slot.endTime}
+                      {slot.isBooked && " Bokad"}
                     </button>
                   ))
                 )}

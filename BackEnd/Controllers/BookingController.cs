@@ -49,11 +49,21 @@ namespace BackEnd.Controllers
                 UserId = userId   
             };
 
+            var selectedSlot = await _context.TimeSlots
+                .FirstOrDefaultAsync(ts => ts.TimeSlotsId == booking.TimeSlotId);
+
+            if (selectedSlot == null) return BadRequest("Invalid timeslot.");
+
             // Kontrollera överlappande bokningar
             var overlap = await _context.Bookings
+                .Include(b => b.TimeSlot)
                 .AnyAsync(b => b.ResourceId == booking.ResourceId &&
                             b.Date.Date == booking.Date.Date &&
-                            b.TimeSlotId == booking.TimeSlotId);
+                            b.TimeSlot != null && (
+                                (selectedSlot.startTime < b.TimeSlot.endTime) &&
+                                (selectedSlot.endTime > b.TimeSlot.startTime)
+                            )
+                        );
 
             if (overlap) return BadRequest("Time slot already booked");
 

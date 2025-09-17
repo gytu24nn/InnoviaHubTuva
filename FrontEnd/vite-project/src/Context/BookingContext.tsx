@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import * as signalR from "@microsoft/signalr";
+import { is } from "date-fns/locale";
 
 // Booking from backend (BookingDTO)
 export interface Booking {
@@ -59,6 +60,8 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+
 useEffect(() => {
   const fetchData = async () => {
     try {
@@ -71,7 +74,7 @@ useEffect(() => {
       setBookings(bookingsData);
 
       const resourcesRes = await fetch("http://localhost:5099/api/Resource/available");
-      if(!bookingsRes.ok) {
+      if(!resourcesRes.ok) {
         throw new Error(`Failed to fetch resources: ${resourcesRes.status}`);
       }
       const resourcesData: Resource[] = await resourcesRes.json();
@@ -97,25 +100,50 @@ useEffect(() => {
   fetchData();
 
   // 🔴 Real-time updates with SignalR
-  const connection = new signalR.HubConnectionBuilder()
-    .withUrl("http://localhost:5099/bookinghub")
+  let isMounted = true; 
+  const Newconnection = new signalR.HubConnectionBuilder()
+    .withUrl("http://localhost:5099/bookingHub", {withCredentials: true})
     .withAutomaticReconnect()
     .build();
 
-  connection.on("BookingCreated", (booking: Booking) => {
-    setBookings((prev) => [...prev, booking]);
+  Newconnection.on("BookingCreated", (booking: Booking) => {
+    if(isMounted) {
+      setBookings((prev) => [...prev, booking]);
+    }
   });
 
-  connection.on("BookingCancelled", (booking: Booking) => {
-    setBookings((prev) => prev.filter((b) => b.bookingId !== booking.bookingId));
+  Newconnection.on("BookingCancelled", (booking: Booking) => {
+    if(isMounted) {
+      setBookings((prev) => prev.filter((b) => b.bookingId !== booking.bookingId));
+    }
   });
 
-  connection.start().catch((err) => console.error("SignalR error:", err));
+  Newconnection.start()
+    .then(() => console.log("SignralR connected"))
+    .catch((err) => console.error("SignalR error:", err));
 
   return () => {
-    connection.stop();
+    isMounted = false; 
+    Newconnection.stop();
   };
 }, []);
+
+useEffect(() => {
+  if(!date || !resourceId || !connection) return; 
+
+  connection
+    .invoke("SendBookingsForResource", resourceId, date)
+    .catch(err => console.error("Error invoking sendBookingsForResource:", err));
+
+  const handler = (updatedBookings: Booking[]) => {
+    setBookings(updatedBookings);
+  }
+  connection.on("ReceiveBookingsForResource", handler);
+
+  return () => {
+    connection.off("ReceiveBookingsForResource", handler);
+  }
+}, [date, resourceId, connection]);
 
   return (
     <BookingContext.Provider
