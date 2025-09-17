@@ -5,10 +5,9 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import {useSearchParams} from "react-router-dom";
 import KontorsLayout from "../../../public/img/Kontorslayout.png"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./booking.css"
 import "../../ErrorAndLoading.css"
-import { da } from "date-fns/locale";
 
 const localizer = momentLocalizer(moment);
 
@@ -44,11 +43,20 @@ const Booking = () => {
   
   // Handle calendar click
   const handleDateSelect = (slotInfo: { start: Date }) => {
-    console.log("SlotInfo från kalender:", slotInfo);
-    setDate(slotInfo.start);
-    setTimeSlotId(null); // reset timeslot when new date is picked
-  };
+    // Förhindra klick på förflutna datum
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
+    const clickedDate = new Date(slotInfo.start);
+    clickedDate.setHours(0, 0, 0, 0);
+
+    if (clickedDate < today) {
+      return; // förflutna datum blockeras
+    }
+
+    setDate(clickedDate); // spara valt datum
+    setTimeSlotId(null); // nollställ vald tid
+  };
   // Filter available slots by selected date
   // const availableSlots = date
   //   ? timeSlots.filter(
@@ -150,6 +158,28 @@ const handleConfirm = async () => {
   }
 };
 
+  // Funktion för att hantera stil för varje dag i kalendern
+  const dayPropGetter = (day: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Gråa ut förflutna datum
+    if (day.getTime() < today.getTime()) {
+      return {
+        className: 'rbc-past-day',
+      };
+    }
+    
+    // Markera det valda datumet
+    if (date && day.toDateString() === date.toDateString()) {
+      return {
+        className: 'rbc-selected-day',
+      };
+    }
+
+    return {};
+  };
+
   if (loading) {
     return <div className="loading-message">⏳ Laddar tider...</div>;
   }
@@ -157,6 +187,13 @@ const handleConfirm = async () => {
   if (error) {
     return <div className="error-message">Fel: {error}</div>;
   }
+
+  useEffect(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  setDate(today);
+  setTimeSlotId(null);
+  }, []);
 
   return (
     <div className="booking-container">
@@ -166,15 +203,16 @@ const handleConfirm = async () => {
       <div className="booking-calender">
         <Calendar
           localizer={localizer}
-          selectable 
+          selectable
           onSelectSlot={handleDateSelect}
-            onDrillDown={date => {
-            setDate(date);
+          date={date || new Date()} 
+          onNavigate={(newDate) => {
+            setDate(newDate); 
             setTimeSlotId(null);
           }}
-          defaultDate={new Date()}   // show today by default
-          views={["month"]}
+          views={['month']} 
           style={{ height: 500 }}
+          dayPropGetter={dayPropGetter}
           />
       </div>
 

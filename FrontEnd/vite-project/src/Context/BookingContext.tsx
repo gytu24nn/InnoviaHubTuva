@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import * as signalR from "@microsoft/signalr";
-import { is } from "date-fns/locale";
 
 // Booking from backend (BookingDTO)
 export interface Booking {
