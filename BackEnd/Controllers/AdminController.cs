@@ -1,11 +1,9 @@
 using BackEnd.Data;
-using BackEnd.Hubs;
 using BackEnd.Models;
 using BackEnd.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.SignalR;
 
 namespace BackEnd.Controllers
 {
@@ -15,12 +13,10 @@ namespace BackEnd.Controllers
     public class AdminController : ControllerBase
     {
         private readonly InnoviaHubDbContext _context;
-        private readonly IHubContext<NotificationHub> _notifHub;
 
-        public AdminController(InnoviaHubDbContext context, IHubContext<NotificationHub> notifHub)
+        public AdminController(InnoviaHubDbContext context)
         {
             _context = context;
-            _notifHub = notifHub;
         }
 
         // Hämtar alla bokningar
@@ -99,7 +95,7 @@ namespace BackEnd.Controllers
 
         // Ändra en resurs, t.ex. namn eller typ. 
         [HttpPatch("resource/edit/{id}")]
-        public async Task<IActionResult> EditResource(int id, [FromBody] EditResourceDTO editResourceDTO)
+        public async Task<IActionResult> EditResource( int id, [FromBody] EditResourceDTO editResourceDTO) 
         {
             var resource = await _context.Resources.FindAsync(id);
 
@@ -138,7 +134,7 @@ namespace BackEnd.Controllers
             await _context.SaveChangesAsync();
 
             var deletedResource = new ResourceDTO
-            {
+            {   
                 ResourceId = resource.ResourcesId,
                 ResourceTypeId = resource.ResourceTypeId,
                 Name = resource.Name
@@ -150,30 +146,30 @@ namespace BackEnd.Controllers
 
 
         // Hämtar alla tidsluckor
-        [HttpGet("timeslots")]
-        public async Task<IActionResult> GetAllTimeSlots()
-        {
-            try
+[HttpGet("timeslots")]
+public async Task<IActionResult> GetAllTimeSlots()
+{
+    try
+    {
+        var slots = await _context.TimeSlots
+            .Select(t => new TimeSlotDTO
             {
-                var slots = await _context.TimeSlots
-                    .Select(t => new TimeSlotDTO
-                    {
-                        TimeSlotsId = t.TimeSlotsId,
-                        StartTime = t.startTime.ToString(@"hh\:mm"),
-                        EndTime = t.endTime.ToString(@"hh\:mm"),
-                        Duration = t.Duration
-                    })
-                    .ToListAsync();
+                TimeSlotsId = t.TimeSlotsId,
+                StartTime = t.startTime.ToString(@"hh\:mm"),
+                EndTime = t.endTime.ToString(@"hh\:mm"),
+                Duration = t.Duration
+            })
+            .ToListAsync();
 
-                return Ok(slots);
-            }
-            catch (Exception ex)
-            {
-                // Log the exact error to backend console
-                Console.WriteLine($"❌ Error in GetAllTimeSlots: {ex.Message}");
-                return StatusCode(500, "Something went wrong when fetching timeslots.");
-            }
-        }
+        return Ok(slots);
+    }
+    catch (Exception ex)
+    {
+        // Log the exact error to backend console
+        Console.WriteLine($"❌ Error in GetAllTimeSlots: {ex.Message}");
+        return StatusCode(500, "Something went wrong when fetching timeslots.");
+    }
+}
 
         // Skapa en ny tidslucka
         [HttpPost("timeslots")]
@@ -282,37 +278,6 @@ namespace BackEnd.Controllers
             };
 
             return Ok(deletedTimeSlot);
-        }
-
-        public record NotifyDto(string Title, string Message, string? UserId);
-
-        [HttpPost("notify")]
-        public async Task<IActionResult> SendNotification([FromBody] NotifyDto dto)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Title) || string.IsNullOrWhiteSpace(dto.Message))
-            {
-                return BadRequest("Titel och meddelande är obligatoriska.");
-            }
-
-            var payload = new
-            {
-                title = dto.Title,
-                message = dto.Message,
-                sentAt = DateTime.UtcNow
-            };
-
-            if (!string.IsNullOrWhiteSpace(dto.UserId))
-            {
-                // Skicka till en specifik användare
-                await _notifHub.Clients.User(dto.UserId).SendAsync("ReceiveNotification", payload);
-            }
-            else
-            {
-                // Skicka till alla anslutna användare
-                await _notifHub.Clients.All.SendAsync("ReceiveNotification", payload);
-            }
-
-            return Ok(new { sent = true });
         }
 
     }
