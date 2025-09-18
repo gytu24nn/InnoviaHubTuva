@@ -32,7 +32,7 @@ const admin = () => {
       startTime: string; 
       endTime: string;
       userEmail:string;
-    //   userName:string; 
+      userName:string; 
     };
 
     // Typ för en resurs
@@ -100,6 +100,13 @@ const admin = () => {
             const response = await fetch(`${adminApiBase}/bookings`, { credentials: 'include' });
             if (!response.ok) { throw new Error('Kunde inte hämta bokningar.'); }
             const data = await response.json();
+
+            console.log("admin bookings length:", data.length);
+            console.log("admin bookings[0]:", data[0]);
+            if (data[0]) {
+                console.log("keys in item[0]:", Object.keys(data[0]));
+                console.log("username:", (data[0] as any).userName);
+            }
             setBookings(data);
         } catch (err) {
             console.error("Kunde inte hämta bokningar:", err);
@@ -293,7 +300,7 @@ const admin = () => {
                                 <strong>Boknings-ID:</strong> {booking.bookingId} | <strong>Resurs:</strong> {booking.resourceName} |{" "}
                                 <strong>Datum:</strong> {new Date(booking.date).toLocaleDateString()} |{" "}
                                 <strong>Tid:</strong> {booking.startTime} | <strong>Slut:</strong> {booking.endTime} |
-                                <strong>Bokad av:</strong> {booking.userEmail} 
+                                <strong>Bokad av:</strong> {booking.userName ?? booking.userEmail} 
                             </li>
                         ))}
                     </ul>

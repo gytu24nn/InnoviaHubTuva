@@ -37,7 +37,7 @@ namespace BackEnd.Controllers
                     Date = b.Date,
                     UserId = b.UserId ?? "",
                     UserEmail = b.User != null ? b.User.Email : "Okänd användare",
-                    // UserName = b.User != null ? b.User.UserName : "Okänd användare",
+                    UserName = b.User != null ? b.User.UserName : "Okänd användare",
                     ResourceId = b.ResourceId,
                     ResourceName = b.Resource != null ? b.Resource.Name : "",
                     TimeSlotId = b.TimeSlotId,
