@@ -9,7 +9,7 @@ interface BookingDetails {
   startTime: string;
   endTime: string;
   date: string;
-  userEmail?: string;
+  userName?: string;
 }
 
 const BookingConfirmed = () => {
@@ -66,7 +66,7 @@ const BookingConfirmed = () => {
           </p>
           <p>
             <span className="ConfirmedLabel">Bokad av:</span>{" "}
-            {booking.userEmail ?? "Okänd användare"}
+            {booking.userName ?? "Okänd användare"}
           </p>
 
           <p className="ConfirmedMessage">

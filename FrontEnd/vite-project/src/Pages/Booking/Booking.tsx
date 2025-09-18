@@ -207,7 +207,50 @@ const handleConfirm = async () => {
           />
       </div>
 
-      
+          {/*välj en resurs*/}
+            <label>Välj resurs:</label>
+            <div>
+              <select 
+                value={resourceId ?? ""}
+                onChange={(e) => setResourceId(Number(e.target.value))}
+                className="booking-resource-select"
+              >
+
+                <option value="" disabled>
+                  -- Välj en resurs -- 
+                </option>
+
+                {availableRescources.map((r) => (
+                  <option key={r.resourcesId} value={r.resourcesId}>
+                    {r.name}
+                  </option>
+                ))}
+
+              </select>
+              {/*Visa färgprick för vald resurs*/}
+              {resourceId && (
+                <span
+                  className="resource-color-dot"
+                  style={{
+                    backgroundColor: selecedType ? resourceColors[selecedType] : "#ccc"
+                  }} 
+              /> 
+              )}
+            </div>
+
+          <button className="booking-map-btn" onClick={() => setShowMap(true)}>
+            Visa kontorslayout
+          </button>
+
+          {/*Karta över kontorslayout*/}
+          {showMap && (
+            <div className="booking-map-modal-overlay" onClick={() => setShowMap(false)}>
+              <div className="booking-map-modal" onClick={e => e.stopPropagation()}>
+                <button className="booking-close-map-btn" onClick={() => setShowMap(false)}>stäng</button>
+                <img src={KontorsLayout} alt="Kontorslayout" className="booking-office-map-img" />
+              </div>              
+            </div>
+          )}
 
       {/* Slots list */}
       {date && (
@@ -238,57 +281,9 @@ const handleConfirm = async () => {
               </div>
             </div>
           ))}
-          
-          {/*välj en resurs*/}
-            <label>Välj resurs:</label>
-            <div>
-              <select 
-                value={resourceId ?? ""}
-                onChange={(e) => setResourceId(Number(e.target.value))}
-                className="booking-resource-select"
-              >
-
-                <option value="" disabled>
-                  -- Välj en resurs -- 
-                </option>
-
-                {availableRescources.map((r) => (
-                  <option key={r.resourcesId} value={r.resourcesId}>
-                    {r.name}
-                  </option>
-                ))}
-
-              </select>
-              {/*Visa färgprick för vald resurs*/}
-              {resourceId && (
-                <span
-                  className="resource-color-dot"
-                  style={{
-                    backgroundColor: selecedType ? resourceColors[selecedType] : "#ccc"
-                  }}
-              
-              />
-              
-              )}
-            </div>
-            
-      
-
-          <button className="booking-map-btn" onClick={() => setShowMap(true)}>
-            Visa kontorslayout
-          </button>
-
-          {/*Karta över kontorslayout*/}
-          {showMap && (
-            <div className="booking-map-modal-overlay" onClick={() => setShowMap(false)}>
-              <div className="booking-map-modal" onClick={e => e.stopPropagation()}>
-                <button className="booking-close-map-btn" onClick={() => setShowMap(false)}>stäng</button>
-                <img src={KontorsLayout} alt="Kontorslayout" className="booking-office-map-img" />
-              </div>              
-            </div>
-          )}
 
           {/* Confirm button */}
+          <div className="booking-confirm-container">
             <button
               onClick={handleConfirm}
               disabled={!timeSlotId}
@@ -296,6 +291,7 @@ const handleConfirm = async () => {
             >
               Boka
             </button>
+          </div>
           </div>
       )}
     </div>
