@@ -57,21 +57,6 @@ const Booking = () => {
     setDate(clickedDate); // spara valt datum
     setTimeSlotId(null); // nollställ vald tid
   };
-  // Filter available slots by selected date
-  // const availableSlots = date
-  //   ? timeSlots.filter(
-  //       (slot) =>
-  //         !bookings.some(
-  //           (b) =>
-  //             new Date(b.date).toLocaleDateString() === date.toLocaleDateString() &&
-  //             b.timeSlotId === slot.timeSlotsId &&
-  //             b.resourceTypeId === resourceTypeId
-  //         )
-  //     )
-  //   : [];
-
-
-    //console.log("Available slots:", availableSlots);
 
   function parseTime(timeStr: string, date: Date): Date {
     const [hours, minutes] = timeStr.split(":").map(Number);
@@ -81,15 +66,21 @@ const Booking = () => {
   const slotsForDay = date && resourceId 
     ? timeSlots.map((slots) => {
       const isBooked = bookings.some((b) => {
-        if(b.resourceId !== resourceId ) return false; 
+        if(b.resourceId !== resourceId || new Date(b.date).toDateString() !== date.toDateString()) {
+          return false;
+        }
 
-        const bookingDate = new Date(b.date);
-        if(bookingDate.toDateString() !== date.toDateString()) return false; 
+        const bookingTimeSlot = timeSlots.find(ts => ts.timeSlotsId === b.timeSlotId);
+
+        if(!bookingTimeSlot || !bookingTimeSlot.startTime || !bookingTimeSlot.endTime) {
+          console.error("Ogiltig bokningsdata (saknar tid):", b);
+          return false; // Hoppa över denna ogiltiga bokning
+        }
 
         const slotStart = parseTime(slots.startTime, date);
         const slotEnd = parseTime(slots.endTime, date);
-        const bookingStart = parseTime(b.startTime, date);
-        const bookingEnd = parseTime(b.endTime, date);
+        const bookingStart = parseTime(bookingTimeSlot.startTime, date);
+        const bookingEnd = parseTime(bookingTimeSlot.endTime, date);
 
         return slotStart < bookingEnd && slotEnd > bookingStart;
 
