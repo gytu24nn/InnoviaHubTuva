@@ -1,7 +1,5 @@
-import { useState } from 'react'
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
 import SignIn from './Pages/SignIn/SignIn';
 import SignUp from './Pages/SignUp/SignUp';
 import Layout from './Pages/Layout/Layout';
@@ -11,31 +9,44 @@ import Home from './Pages/Home/Home';
 import Booking from './Pages/Booking/Booking';
 import Resursvy from './Pages/Booking/Resursvy';
 import BookingConfirmed from './Pages/Booking/BookingConfirmed';
-
 import { BookingProvider } from "./Context/BookingContext";
+import { UserProvider, useUser } from './Context/UserContext'; 
+import ProtectedRoute from "./Components/ProtectedRoute";
+import AdminRoute from './Components/AdminRoute';
+
+const AppContent = () => {
+    const { loading: userLoading } = useUser();
+
+    if (userLoading) {
+        return <div className="loading-message">Laddar användardata...</div>;
+    }
+
+    return (
+        <Routes>
+            <Route path="/" element={<SignIn />} />
+            <Route path="/SignUp" element={<SignUp />} />
+
+            <Route element={<Layout />}>
+                <Route path='/Admin' element={<AdminRoute><Admin /></AdminRoute>} />
+                <Route path='/MyBookings' element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
+                <Route path='/Resursvy' element={<ProtectedRoute><Resursvy /></ProtectedRoute>} />
+                <Route path='/Home' element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path='/Booking' element={<ProtectedRoute><Booking /></ProtectedRoute>} />
+                <Route path='/BookingConfirmed/:bookingId' element={<ProtectedRoute><BookingConfirmed /></ProtectedRoute>} />
+            </Route>
+        </Routes>
+    );
+};
 
 function App() {
   return (
-    <BookingProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<SignIn />} />
-          <Route path="/SignUp" element={<SignUp />} />
-
-          {/* All routes with Layout wrapper */}
-          <Route element={<Layout />}>
-            <Route path='/Admin' element={<Admin />} />
-            <Route path='/MyBookings' element={<MyBookings />} />
-            <Route path='/Resursvy' element={<Resursvy />} />
-            <Route path='/Home' element={<Home />} />
-            <Route path='/Booking' element={<Booking />} />
-
-            {/* ✅ new BookingConfirmed route */}
-            <Route path='/BookingConfirmed/:bookingId' element={<BookingConfirmed />} />
-          </Route>
-        </Routes>
-      </Router>
-    </BookingProvider>
+    <UserProvider>
+      <BookingProvider>
+        <Router>
+            <AppContent />
+        </Router>
+      </BookingProvider>
+    </UserProvider>
   );
 }
 

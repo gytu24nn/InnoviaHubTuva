@@ -2,6 +2,7 @@ import "./header.css"
 import {Link, useNavigate} from "react-router-dom"
 import { logout } from "../../../Services/authService";
 import { useState } from "react";
+import { useUser } from "../../../Context/UserContext";
 
 type MenuProps = {
     isOpen: boolean;
@@ -10,6 +11,7 @@ type MenuProps = {
 const meny = ({isOpen}: MenuProps) => {
     const navigate = useNavigate();
     const [loggingOut, setLoggingOut] = useState(false);
+    const { isAdmin, isLoggedIn } = useUser();
 
     const handleLogout = async () => {
         if (loggingOut) return; // Prevent multiple clicks
@@ -29,11 +31,15 @@ const meny = ({isOpen}: MenuProps) => {
     return (
         <nav className={`menu ${isOpen ? "open" : ""}`}>
             <ul>
+                {isAdmin && ((
                 <li>
                     <Link className="linkMenuOption" to={"/Admin"}>
                        <i className="fa-solid fa-star"></i>Admin panel
                     </Link>
                 </li>
+                ))}
+                {isLoggedIn && (
+                    <>
                 <li>
                     <Link className="linkMenuOption" to={"/MyBookings"}>
                         <i className="fa-solid fa-star"></i>Mina bokningar
@@ -54,6 +60,8 @@ const meny = ({isOpen}: MenuProps) => {
                     <i className="fa-solid fa-star"></i>{loggingOut ? "Loggar ut..." : "Logga ut"}
                 </button>
                 </li>
+                </>
+                )}
             </ul>
         </nav>
     )

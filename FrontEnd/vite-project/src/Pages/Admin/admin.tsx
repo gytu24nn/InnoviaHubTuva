@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import "./Admin.css"
 import "../../ErrorAndLoading.css"
+import { useUser } from "../../Context/UserContext";
 
 const admin = () => {
+    const {isAdmin} = useUser();
     const [resources, setResources] = useState<Resource[]>([]);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [newResource, setNewResource] = useState<{ resourceTypeId: string; name: string }>({ resourceTypeId: "", name: ""});
@@ -10,8 +12,6 @@ const admin = () => {
     const [resourceTypes, setResourceTypes] = useState<ResourceType[]>([]);
     const [selectedResourceType, setSelectedResourceType] = useState<number | null>(null);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
-    const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     const [ntTitle, setNtTitle] = useState("");
@@ -55,31 +55,6 @@ const admin = () => {
 
     const apiBase = "/api"; 
     const adminApiBase = `${apiBase}/admin`;
-    const authApiBase = `${apiBase}/auth`;
-
-    // Funktion för att hämta användarens behörighet från servern
-    const checkUserRole = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const response = await fetch(`${authApiBase}/me`, {
-          credentials: 'include'
-        });
-        
-        if (response.ok) {
-          const user = await response.json();
-          setIsAdmin(user.roles.includes("Admin"));
-        } else {
-          setIsAdmin(false); 
-        }
-      } catch (err) {
-        console.error("Fel vid behörighetskontroll:", err);
-        setError("Kunde inte verifiera behörighet.");
-        setIsAdmin(false);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     // Hämta alla resurser
     const fetchResources = async () => {
@@ -125,11 +100,6 @@ const admin = () => {
             setError("Kunde inte hämta resurstyper.");
         }
     };
-    
-    // Anrop till API-slutpunkter vid komponentens start
-    useEffect(() => {
-        checkUserRole();
-    }, []);
 
     useEffect(() => {
       if (isAdmin) {
@@ -245,27 +215,7 @@ const admin = () => {
         return booking.date.split('T')[0] === selectedDate;
     });
 
-    // Visa laddningsstatus medan vi väntar på behörighetskontrollen
-    if (loading) {
-        return (
-            <div id="admin-panel">
-                <div className="errorAndLoadingMessage-container">
-                    <p className="loading-message">Laddar...</p>
-                </div>
-            </div>
-        );
-    }
 
-    // Om användaren inte är admin, returnera ett felmeddelande
-    if (!isAdmin) {
-        return (
-            <div id="admin-panel">
-                <div className="errorAndLoadingMessage-container">
-                    <p className="error-message">Åtkomst nekad - du har inte behörighet att se denna sida.</p>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div id="admin-panel">
