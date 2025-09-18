@@ -74,6 +74,7 @@ namespace BackEnd.Controllers
             var createdBooking = await _context.Bookings
                 .Include(b => b.Resource)
                 .Include(b => b.TimeSlot)
+                .Include(b => b.User)
                 .FirstOrDefaultAsync(b => b.BookingId == booking.BookingId);
 
             if (createdBooking == null) return NotFound();
@@ -84,6 +85,7 @@ namespace BackEnd.Controllers
                 BookingId = createdBooking.BookingId,
                 Date = createdBooking.Date,
                 UserId = createdBooking.UserId ?? "",
+                UserName = createdBooking.User?.UserName ?? "",
                 ResourceId = createdBooking.ResourceId,
                 ResourceName = createdBooking.Resource?.Name ?? "",
                 TimeSlotId = createdBooking.TimeSlotId,
@@ -104,6 +106,7 @@ namespace BackEnd.Controllers
             var booking = await _context.Bookings
                 .Include(b => b.Resource)
                 .Include(b => b.TimeSlot)
+                .Include(b => b.User)
                 .FirstOrDefaultAsync(b => b.BookingId == id);
 
             if (booking == null)
@@ -114,6 +117,7 @@ namespace BackEnd.Controllers
                 BookingId = booking.BookingId,
                 Date = booking.Date,
                 UserId = booking.UserId ?? "",
+                UserName = booking.User?.UserName ?? "",
                 ResourceId = booking.ResourceId,
                 ResourceName = booking.Resource?.Name ?? "",
                 TimeSlotId = booking.TimeSlotId,
@@ -175,11 +179,13 @@ public async Task<IActionResult> GetAllMyBookings()
         .Where(b => b.UserId != null && b.UserId.Trim() == userId)
         .Include(b => b.Resource)
         .Include(b => b.TimeSlot)
+        .Include(b => b.User)
         .Select(b => new BookingDTO
         {
             BookingId = b.BookingId,
             Date = b.Date,
             UserId = b.UserId ?? "",
+            UserName = b.User != null ? b.User.UserName : "",
             ResourceId = b.ResourceId,
             ResourceName = b.Resource != null ? b.Resource.Name : "",
             TimeSlotId = b.TimeSlotId,
