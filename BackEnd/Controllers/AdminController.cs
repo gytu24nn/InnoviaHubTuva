@@ -4,6 +4,8 @@ using BackEnd.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using BackEnd.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BackEnd.Controllers
 {
@@ -13,10 +15,12 @@ namespace BackEnd.Controllers
     public class AdminController : ControllerBase
     {
         private readonly InnoviaHubDbContext _context;
+        private readonly IHubContext<NotificationHub> _notifHub;
 
-        public AdminController(InnoviaHubDbContext context)
+        public AdminController(InnoviaHubDbContext context,  IHubContext<NotificationHub> notifHub)
         {
             _context = context;
+            _notifHub = notifHub;
         }
 
         // Hämtar alla bokningar
@@ -146,72 +150,72 @@ namespace BackEnd.Controllers
 
 
         // Hämtar alla tidsluckor
-[HttpGet("timeslots")]
-public async Task<IActionResult> GetAllTimeSlots()
-{
-    try
-    {
-        var slots = await _context.TimeSlots
-            .Select(t => new TimeSlotDTO
-            {
-                TimeSlotsId = t.TimeSlotsId,
-                StartTime = t.startTime.ToString(@"hh\:mm"),
-                EndTime = t.endTime.ToString(@"hh\:mm"),
-                Duration = t.Duration
-            })
-            .ToListAsync();
+// [HttpGet("timeslots")]
+// public async Task<IActionResult> GetAllTimeSlots()
+// {
+//     try
+//     {
+//         var slots = await _context.TimeSlots
+//             .Select(t => new TimeSlotDTO
+//             {
+//                 TimeSlotsId = t.TimeSlotsId,
+//                 StartTime = t.startTime.ToString(@"hh\:mm"),
+//                 EndTime = t.endTime.ToString(@"hh\:mm"),
+//                 Duration = t.Duration
+//             })
+//             .ToListAsync();
 
-        return Ok(slots);
-    }
-    catch (Exception ex)
-    {
-        // Log the exact error to backend console
-        Console.WriteLine($"❌ Error in GetAllTimeSlots: {ex.Message}");
-        return StatusCode(500, "Something went wrong when fetching timeslots.");
-    }
-}
+//         return Ok(slots);
+//     }
+//     catch (Exception ex)
+//     {
+//         // Log the exact error to backend console
+//         Console.WriteLine($"❌ Error in GetAllTimeSlots: {ex.Message}");
+//         return StatusCode(500, "Something went wrong when fetching timeslots.");
+//     }
+// }
 
         // Skapa en ny tidslucka
-        [HttpPost("timeslots")]
-        public async Task<IActionResult> AddTimeSlot([FromBody] CreateTimeSlotDTO dto)
-        {
-            if (!ModelState.IsValid || dto.StartTime >= dto.EndTime)
-            {
-                return BadRequest("Ogiltig tidslucka.");
-            }
+        // [HttpPost("timeslots")]
+        // public async Task<IActionResult> AddTimeSlot([FromBody] CreateTimeSlotDTO dto)
+        // {
+        //     if (!ModelState.IsValid || dto.StartTime >= dto.EndTime)
+        //     {
+        //         return BadRequest("Ogiltig tidslucka.");
+        //     }
 
-            // Kontrollera överlappning
-            bool overlapExists = await _context.TimeSlots.AnyAsync(t =>
-                (dto.StartTime < t.endTime && dto.EndTime > t.startTime)
-            );
+        //     // Kontrollera överlappning
+        //     bool overlapExists = await _context.TimeSlots.AnyAsync(t =>
+        //         (dto.StartTime < t.endTime && dto.EndTime > t.startTime)
+        //     );
 
-            if (overlapExists)
-            {
-                return Conflict("Det finns redan en tidslucka som överlappar den angivna tiden.");
-            }
+        //     if (overlapExists)
+        //     {
+        //         return Conflict("Det finns redan en tidslucka som överlappar den angivna tiden.");
+        //     }
 
-            var duration = (int)(dto.EndTime - dto.StartTime).TotalMinutes;
+        //     var duration = (int)(dto.EndTime - dto.StartTime).TotalMinutes;
 
-            var newTimeSlot = new TimeSlots
-            {
-                startTime = dto.StartTime,
-                endTime = dto.EndTime,
-                Duration = duration
-            };
+        //     var newTimeSlot = new TimeSlots
+        //     {
+        //         startTime = dto.StartTime,
+        //         endTime = dto.EndTime,
+        //         Duration = duration
+        //     };
 
-            _context.TimeSlots.Add(newTimeSlot);
-            await _context.SaveChangesAsync();
+        //     _context.TimeSlots.Add(newTimeSlot);
+        //     await _context.SaveChangesAsync();
 
-            var result = new TimeSlotDTO
-            {
-                TimeSlotsId = newTimeSlot.TimeSlotsId,
-                StartTime = newTimeSlot.startTime.ToString(@"hh\\:mm"),
-                EndTime = newTimeSlot.endTime.ToString(@"hh\\:mm"),
-                Duration = newTimeSlot.Duration
-            };
+        //     var result = new TimeSlotDTO
+        //     {
+        //         TimeSlotsId = newTimeSlot.TimeSlotsId,
+        //         StartTime = newTimeSlot.startTime.ToString(@"hh\\:mm"),
+        //         EndTime = newTimeSlot.endTime.ToString(@"hh\\:mm"),
+        //         Duration = newTimeSlot.Duration
+        //     };
 
-            return CreatedAtAction(nameof(GetAllTimeSlots), new { id = newTimeSlot.TimeSlotsId }, result);
-        }
+        //     return CreatedAtAction(nameof(GetAllTimeSlots), new { id = newTimeSlot.TimeSlotsId }, result);
+        // }
 
         // Ändra en tidslucka
         [HttpPatch("timeslot/{id}")]
@@ -279,6 +283,36 @@ public async Task<IActionResult> GetAllTimeSlots()
 
             return Ok(deletedTimeSlot);
         }
+    
+        public record NotifyDto(string Title, string Message, string? UserId);
 
+        [HttpPost("notify")]
+        public async Task<IActionResult> SendNotification([FromBody] NotifyDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Title) || string.IsNullOrWhiteSpace(dto.Message))
+            {
+                return BadRequest("Titel och meddelande är obligatoriska.");
+            }
+
+            var payload = new
+            {
+                title = dto.Title,
+                message = dto.Message,
+                sentAt = DateTime.UtcNow
+            };
+
+            if (!string.IsNullOrWhiteSpace(dto.UserId))
+            {
+                // Skicka till en specifik användare
+                await _notifHub.Clients.User(dto.UserId).SendAsync("ReceiveNotification", payload);
+            }
+            else
+            {
+                // Skicka till alla anslutna användare
+                await _notifHub.Clients.All.SendAsync("ReceiveNotification", payload);
+            }
+
+            return Ok(new { sent = true });
+        }
     }
 }
