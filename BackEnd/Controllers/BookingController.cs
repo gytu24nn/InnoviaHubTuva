@@ -44,7 +44,7 @@ namespace BackEnd.Controllers
 
             var booking = new Booking
             {
-                Date = bookingDto.Date,
+                Date = bookingDto.Date.Date, // store date component only
                 ResourceId = bookingDto.ResourceId,
                 TimeSlotId = bookingDto.TimeSlotId,
                 UserId = userId
@@ -85,6 +85,7 @@ namespace BackEnd.Controllers
             {
                 BookingId = createdBooking.BookingId,
                 Date = createdBooking.Date,
+                FormattedDate = createdBooking.Date.ToString("yyyy-MM-dd"), // date only
                 UserId = createdBooking.UserId ?? "",
                 UserName = createdBooking.User?.UserName ?? "",
                 ResourceId = createdBooking.ResourceId,
@@ -96,7 +97,7 @@ namespace BackEnd.Controllers
 
             await _hubContext.Clients.All.SendAsync("BookingCreated", result);
 
-            return CreatedAtAction(nameof(CreateBooking), new { id = result.BookingId }, result);
+            return CreatedAtAction(nameof(GetBookingById), new { id = result.BookingId }, result);
         }
 
         // Get a single booking by ID (for BookingConfirmed page)
@@ -117,6 +118,7 @@ namespace BackEnd.Controllers
             {
                 BookingId = booking.BookingId,
                 Date = booking.Date,
+                FormattedDate = booking.Date.ToString("yyyy-MM-dd"),
                 UserId = booking.UserId ?? "",
                 UserName = booking.User?.UserName ?? "",
                 ResourceId = booking.ResourceId,
@@ -187,6 +189,7 @@ namespace BackEnd.Controllers
                     Date = b.Date,
                     UserId = b.UserId ?? "",
                     UserName = b.User != null ? b.User.UserName : "",
+                    FormattedDate = b.Date.ToString("yyyy-MM-dd"),
                     ResourceId = b.ResourceId,
                     ResourceName = b.Resource != null ? b.Resource.Name : "",
                     TimeSlotId = b.TimeSlotId,

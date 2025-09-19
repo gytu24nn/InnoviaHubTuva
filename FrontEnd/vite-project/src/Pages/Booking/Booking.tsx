@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import "./booking.css"
 import "../../ErrorAndLoading.css"
 import OfficeLayout from "../../Components/OfficeLayout";
+import { set } from "date-fns";
 
 const localizer = momentLocalizer(moment);
 
@@ -116,8 +117,9 @@ const handleConfirm = async () => {
   }
 
   // Skapa boknings-objekt
+  const utcMidnight = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   const bookingData = {
-    date: date.toISOString(),
+    date: utcMidnight.toISOString(),
     resourceId: Number(resourceId),
     timeSlotId: timeSlotId,
     // Lägg till fler fält om det behövs, t.ex. userId
@@ -134,6 +136,9 @@ const handleConfirm = async () => {
     if (!response.ok) {
       throw new Error("Kunde inte boka tiden.");
     }
+
+    setTimeSlotId(null);
+    setResourceId(null);
 
     const result = await response.json();
     // Navigera till bekräftelsesida med boknings-id

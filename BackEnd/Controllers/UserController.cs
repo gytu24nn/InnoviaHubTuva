@@ -19,7 +19,6 @@ namespace BackEnd.Controllers
             _context = context;
         }
 
-
         [HttpGet("timeslots")]
         public async Task<IActionResult> GetAllTimeSlots()
         {
