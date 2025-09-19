@@ -39,6 +39,27 @@
     transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
+.booking-item.booking-skrivbord {
+  border-color: #ffee99;
+  border-width: 5px;
+}
+
+.booking-item.booking-motesrum {
+  border-color: #B5E7AE;
+  border-width: 5px;
+}
+
+.booking-item.booking-vr {
+  border-color: #A6CBF5;
+  border-width: 5px;
+}
+
+.booking-item.booking-ai {
+  border-color: #D6A8F2;
+  border-width: 5px;
+}
+
+
 /* Avboka-knapp */
 .cancelBtn {
     background-color: #dc3545;
@@ -57,7 +78,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.myBookingsList li:hover {
+ .myBookingsList li:hover {
     background-color: #88b1e4;
     transform: translateY(-2px);
 }
@@ -80,6 +101,13 @@
     color: #888;
     font-style: italic;
 }
+
+.OfficeLayout {
+  margin-top: 2rem;
+  margin-bottom: -2rem;
+}
+
+/* ... resten av din befintliga CSS ... */
 
 @media (max-width: 600px) {
   .myBookingsContainer {

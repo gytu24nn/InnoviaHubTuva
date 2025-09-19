@@ -4,10 +4,10 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import {useSearchParams} from "react-router-dom";
-import KontorsLayout from "../../../public/img/Kontorslayout.png"
 import { useEffect, useState } from "react";
 import "./booking.css"
 import "../../ErrorAndLoading.css"
+import OfficeLayout from "../../Components/OfficeLayout";
 
 const localizer = momentLocalizer(moment);
 
@@ -25,13 +25,6 @@ const Booking = () => {
     resourceId,
     setResourceId
   } = useBookingContext();
-
-  const resourceColors: Record<string, string> = {
-    "Mötesrum": "#B5E7AE",
-    "Skrivbord": "#FFEE99",
-    "VR": "#A6CBF5",
-    "AI": "#D6A8F2"
-  }
 
   const navigate = useNavigate();
 
@@ -225,32 +218,11 @@ const handleConfirm = async () => {
                     {r.name}
                   </option>
                 ))}
-
               </select>
-              {/*Visa färgprick för vald resurs*/}
-              {resourceId && (
-                <span
-                  className="resource-color-dot"
-                  style={{
-                    backgroundColor: selecedType ? resourceColors[selecedType] : "#ccc"
-                  }} 
-              /> 
-              )}
             </div>
 
-          <button className="booking-map-btn" onClick={() => setShowMap(true)}>
-            Visa kontorslayout
-          </button>
-
-          {/*Karta över kontorslayout*/}
-          {showMap && (
-            <div className="booking-map-modal-overlay" onClick={() => setShowMap(false)}>
-              <div className="booking-map-modal" onClick={e => e.stopPropagation()}>
-                <button className="booking-close-map-btn" onClick={() => setShowMap(false)}>stäng</button>
-                <img src={KontorsLayout} alt="Kontorslayout" className="booking-office-map-img" />
-              </div>              
-            </div>
-          )}
+          
+        <OfficeLayout/>
 
       {/* Slots list */}
       {date && (

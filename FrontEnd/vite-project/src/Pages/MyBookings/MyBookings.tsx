@@ -2,6 +2,8 @@ import {useState, useEffect} from 'react'
 // import { IMyBooking } from "./TempInterface";
 import "../../ErrorAndLoading.css"
 import "./MyBookings.css"
+import OfficeLayout from '../../Components/OfficeLayout'
+import "../Booking/booking.css"
 
 type Booking = {
   bookingId: number;
@@ -19,6 +21,7 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showMap, setShowMap] = useState(false);
 
   //fetch my bookings
   const fetchMyBookings = async () => {
@@ -70,9 +73,31 @@ const MyBookings = () => {
     }
   };
 
+  const getBookingClass = (resourceName: string) => {
+    const nameLower = resourceName.toLocaleLowerCase();
+
+    if (nameLower.includes('skrivbord')) {
+        return 'booking-skrivbord';
+    }
+    if (nameLower.includes('mötesrum')) {
+        return 'booking-motesrum';
+    }
+    if (nameLower.includes('vr')) {
+        return 'booking-vr';
+    }
+    if (nameLower.includes('ai')) {
+        return 'booking-ai';
+    }
+    return '';
+  }
+ 
   return (
     <div className='myBookingsContainer'>
       <h2>Mina bokningar</h2>
+      <div className='OfficeLayout'>
+        <OfficeLayout/>
+      </div>
+      
 
       <div className="errorAndLoadingMessage-container">
         {loading && <p className='loading-message'>Laddar bokningar...</p>}
@@ -89,7 +114,7 @@ const MyBookings = () => {
       {!loading && bookings.length > 0 && (
         <ul className='myBookingsList'>
           {bookings.map((b) => (
-            <li key={b.bookingId}>
+            <li key={b.bookingId} className={`booking-item ${getBookingClass(b.resourceName)}`}>
               <span className='bookingResource'>{b.resourceName}</span>
               <span className='bookingDatetime'>
                 {new Date(b.date).toLocaleDateString("sv-SE")} ({b.startTime} - {b.endTime})
