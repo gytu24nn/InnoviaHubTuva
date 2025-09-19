@@ -9,6 +9,8 @@ import Home from './Pages/Home/Home';
 import Booking from './Pages/Booking/Booking';
 import Resursvy from './Pages/Booking/Resursvy';
 import BookingConfirmed from './Pages/Booking/BookingConfirmed';
+import ErrorBoundaryFallback from './Components/errorbounday';
+import { ErrorBoundary } from "react-error-boundary";
 import { BookingProvider } from "./Context/BookingContext";
 import { UserProvider, useUser } from './Context/UserContext'; 
 import ProtectedRoute from "./Components/ProtectedRoute";
@@ -42,9 +44,11 @@ function App() {
   return (
     <UserProvider>
       <BookingProvider>
-        <Router>
-            <AppContent />
-        </Router>
+        <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
+          <Router>
+             <AppContent />
+          </Router>
+        </ErrorBoundary>
       </BookingProvider>
     </UserProvider>
   );

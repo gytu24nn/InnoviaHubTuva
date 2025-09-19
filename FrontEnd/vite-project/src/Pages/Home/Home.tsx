@@ -3,11 +3,16 @@ import { Link, useNavigate } from "react-router-dom"
 
 const Home = () => {
   const navigate = useNavigate();
+  
+  //Test for errorbondary
+  //throw new Error("Testfel från HomePage");
+
   const handleGettingStartedButton = () => {
     navigate("/Resursvy");
   }
   return (
     <div className="HomePage">
+      
       <div className="HeroImage">
         <img src="img/HomePicture.jpg" alt="Kontosmiljö" />
       </div>
