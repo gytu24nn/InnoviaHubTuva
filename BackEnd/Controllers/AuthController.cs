@@ -10,7 +10,6 @@ using System;
 using BackEnd.Models;
 using Microsoft.AspNetCore.Authorization;
 
-
 namespace BackEnd.Controllers
 {
     [Route("api/[controller]")]
@@ -95,41 +94,6 @@ namespace BackEnd.Controllers
                     });
 
                     return Ok(new { user.Id, user.UserName, Role = roleClaim });
-
-
-
-                    // var tokenHandler = new JwtSecurityTokenHandler();
-                    // var key = Encoding.ASCII.GetBytes("SuperDuperUltraMegaSecureJWTSecretKeyThatIsLongEnough!");
-
-                    // var tokenDescriptor = new SecurityTokenDescriptor
-                    // {
-                    //     Issuer = "http://localhost:5099",
-                    //     Audience = "http://localhost:5099",
-                    //     Subject = new ClaimsIdentity(new Claim[] {
-                    //     new Claim(ClaimTypes.Name, user.UserName),
-                    //     new Claim(ClaimTypes.Role, roleClaim),
-                    //     new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    // }),
-                    //     Expires = DateTime.UtcNow.AddHours(1),
-                    //     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                    // };
-
-                    // var token = tokenHandler.CreateToken(tokenDescriptor);
-                    // var tokenString = tokenHandler.WriteToken(token);
-
-                    // if (roleClaim.ToLower() == "user")
-                    // {
-                    //     return Ok(new
-                    //     {
-                    //         user.Id,
-                    //         user.UserName,
-                    //         Role = roleClaim,
-                    //         Token = tokenString,
-                    //     });
-                    // }
-
-                    // Om admin
-                    // return Ok(new { user.Id, user.UserName, Role = roleClaim, Token = tokenString });
                 }
                 return Unauthorized();
             }

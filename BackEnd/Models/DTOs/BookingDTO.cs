@@ -4,6 +4,7 @@ public class BookingDTO
 {
     public int BookingId { get; set; }
     public DateTime Date { get; set; }
+    public string FormattedDate { get; set; } = "";
     public string UserId { get; set; } = "";
     public int ResourceId { get; set; }
     public string ResourceName { get; set; } = "";

@@ -10,6 +10,7 @@ interface BookingDetails {
   startTime: string;
   endTime: string;
   date: string;
+  formattedDate?: string;
   userName?: string;
 }
 
@@ -19,21 +20,27 @@ const BookingConfirmed = () => {
   const [booking, setBooking] = useState<BookingDetails | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchBooking = async () => {
-      try {
-        const res = await fetch(`http://localhost:5099/api/booking/${bookingId}`);
-        if (!res.ok) throw new Error("Kunde inte hämta bokningsinformationen.");
-        const data: BookingDetails = await res.json();
-        setBooking(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  const fetchBooking = async () => {
+    try {
+      const res = await fetch(`http://localhost:5099/api/booking/${bookingId}`, {
+        credentials: "include"
+      });
+      if (!res.ok) {
+        // helpful debug: log status
+        console.error("Fetch booking failed:", res.status, await res.text());
+        throw new Error("Kunde inte hämta bokningsinformationen.");
       }
-    };
-    fetchBooking();
-  }, [bookingId]);
+      const data: BookingDetails = await res.json();
+      setBooking(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchBooking();
+}, [bookingId]);
 
   if (loading) {
     return <div className="PageLayout">⏳ Laddar bokningsinformation...</div>;
@@ -59,7 +66,7 @@ const BookingConfirmed = () => {
           </p>
           <p>
             <span className="ConfirmedLabel">Datum:</span>{" "}
-            {new Date(booking.date).toLocaleDateString("sv-SE")}
+            {booking.formattedDate ?? new Date(booking.date).toLocaleDateString("sv-SE")}
           </p>
           <p>
             <span className="ConfirmedLabel">Tid:</span>{" "}

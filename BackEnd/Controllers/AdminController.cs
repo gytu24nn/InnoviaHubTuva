@@ -49,14 +49,6 @@ namespace BackEnd.Controllers
             return Ok(bookings);
         }
 
-        // Hämtar alla resurstyper
-        // [HttpGet("resourcetypes")]
-        // public async Task<IActionResult> GetAllResourceTypes()
-        // {
-        //     var resourceTypes = await _context.ResourceTypes.ToListAsync();
-        //     return Ok(resourceTypes);
-        // }
-
         // Hämtar alla resurser
         [HttpGet("resources")]
         public async Task<IActionResult> GetAllResources()
@@ -147,77 +139,7 @@ namespace BackEnd.Controllers
             return Ok(deletedResource);
         }
 
-
-
-        // Hämtar alla tidsluckor
-// [HttpGet("timeslots")]
-// public async Task<IActionResult> GetAllTimeSlots()
-// {
-//     try
-//     {
-//         var slots = await _context.TimeSlots
-//             .Select(t => new TimeSlotDTO
-//             {
-//                 TimeSlotsId = t.TimeSlotsId,
-//                 StartTime = t.startTime.ToString(@"hh\:mm"),
-//                 EndTime = t.endTime.ToString(@"hh\:mm"),
-//                 Duration = t.Duration
-//             })
-//             .ToListAsync();
-
-//         return Ok(slots);
-//     }
-//     catch (Exception ex)
-//     {
-//         // Log the exact error to backend console
-//         Console.WriteLine($"❌ Error in GetAllTimeSlots: {ex.Message}");
-//         return StatusCode(500, "Something went wrong when fetching timeslots.");
-//     }
-// }
-
-        // Skapa en ny tidslucka
-        // [HttpPost("timeslots")]
-        // public async Task<IActionResult> AddTimeSlot([FromBody] CreateTimeSlotDTO dto)
-        // {
-        //     if (!ModelState.IsValid || dto.StartTime >= dto.EndTime)
-        //     {
-        //         return BadRequest("Ogiltig tidslucka.");
-        //     }
-
-        //     // Kontrollera överlappning
-        //     bool overlapExists = await _context.TimeSlots.AnyAsync(t =>
-        //         (dto.StartTime < t.endTime && dto.EndTime > t.startTime)
-        //     );
-
-        //     if (overlapExists)
-        //     {
-        //         return Conflict("Det finns redan en tidslucka som överlappar den angivna tiden.");
-        //     }
-
-        //     var duration = (int)(dto.EndTime - dto.StartTime).TotalMinutes;
-
-        //     var newTimeSlot = new TimeSlots
-        //     {
-        //         startTime = dto.StartTime,
-        //         endTime = dto.EndTime,
-        //         Duration = duration
-        //     };
-
-        //     _context.TimeSlots.Add(newTimeSlot);
-        //     await _context.SaveChangesAsync();
-
-        //     var result = new TimeSlotDTO
-        //     {
-        //         TimeSlotsId = newTimeSlot.TimeSlotsId,
-        //         StartTime = newTimeSlot.startTime.ToString(@"hh\\:mm"),
-        //         EndTime = newTimeSlot.endTime.ToString(@"hh\\:mm"),
-        //         Duration = newTimeSlot.Duration
-        //     };
-
-        //     return CreatedAtAction(nameof(GetAllTimeSlots), new { id = newTimeSlot.TimeSlotsId }, result);
-        // }
-
-        // Ändra en tidslucka
+        // Ändra en tidslucka (Framtidsprojekt)
         [HttpPatch("timeslot/{id}")]
         public async Task<IActionResult> ChangeTimeSlot(int id, [FromBody] CreateTimeSlotDTO dto)
         {
@@ -260,7 +182,7 @@ namespace BackEnd.Controllers
             return Ok(updatedTimeSlot);
         }
 
-        // Ta bort en tidslucka
+        // Ta bort en tidslucka (Framtidsprojekt)
         [HttpDelete("timeslot/{id}")]
         public async Task<IActionResult> DeleteTimeSlot(int id)
         {
