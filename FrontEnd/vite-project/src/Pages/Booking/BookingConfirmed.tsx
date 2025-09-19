@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react"; // ✅ green checkmark icon
 import "./BookingConfirmed.css";
+// import { useUser } from "../../Context/UserContext";
 
 interface BookingDetails {
   bookingId: number;

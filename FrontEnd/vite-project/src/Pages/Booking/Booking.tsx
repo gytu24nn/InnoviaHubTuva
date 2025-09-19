@@ -19,8 +19,8 @@ const Booking = () => {
     setTimeSlotId,
     timeSlots,
     bookings,
-    loading,
-    error,
+    // loading,
+    // error,
     resource,
     resourceId,
     setResourceId
@@ -33,6 +33,7 @@ const Booking = () => {
   const resourceTypeId = resourceTypeIdParam ? Number(resourceTypeIdParam) : null;
   const resourceName = searchParams.get("resourceName");
   const [showMap, setShowMap] = useState(false);
+  // const { isLoggedIn, loading: userLoading } = useUser();
   
   // Handle calendar click
   const handleDateSelect = (slotInfo: { start: Date }) => {
@@ -163,14 +164,6 @@ const handleConfirm = async () => {
 
     return {};
   };
-
-  if (loading) {
-    return <div className="loading-message">⏳ Laddar tider...</div>;
-  }
-
-  if (error) {
-    return <div className="error-message">Fel: {error}</div>;
-  }
 
   useEffect(() => {
   const today = new Date();

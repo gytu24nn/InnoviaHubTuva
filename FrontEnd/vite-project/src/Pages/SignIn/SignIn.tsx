@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { signIn, fetchMe } from '../../Services/authService'
 import './SignIn.css'
+import { useUser } from '../../Context/UserContext'
 
 
 const SignIn = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const { refreshUser } = useUser();
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -18,8 +20,12 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      const { id, userName, role } = await signIn(username.trim(), password);
+      const { id, userName, role } = 
+      
+      await signIn(username.trim(), password);
       const me = await fetchMe();
+
+      await refreshUser();
 
       if (role?.toLowerCase() === 'admin') {
         navigate('/Admin');

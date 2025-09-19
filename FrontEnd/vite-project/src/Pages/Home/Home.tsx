@@ -1,10 +1,12 @@
 import "./Home.css"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const Home = () => {
   const navigate = useNavigate();
+  
   //Test for errorbondary
   //throw new Error("Testfel från HomePage");
+
   const handleGettingStartedButton = () => {
     navigate("/Resursvy");
   }

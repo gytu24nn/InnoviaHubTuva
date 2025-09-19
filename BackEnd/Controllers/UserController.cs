@@ -9,7 +9,7 @@ namespace BackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // [Authorize] // Alla inloggade användare kan nå dessa endpoints
+    [Authorize] // Alla inloggade användare kan nå dessa endpoints
     public class UserController : ControllerBase
     {
         private readonly InnoviaHubDbContext _context;

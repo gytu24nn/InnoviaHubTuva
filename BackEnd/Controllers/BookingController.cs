@@ -18,6 +18,7 @@ namespace BackEnd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BookingController : ControllerBase
     {
 
@@ -46,7 +47,7 @@ namespace BackEnd.Controllers
                 Date = bookingDto.Date,
                 ResourceId = bookingDto.ResourceId,
                 TimeSlotId = bookingDto.TimeSlotId,
-                UserId = userId   
+                UserId = userId
             };
 
             var selectedSlot = await _context.TimeSlots
@@ -126,7 +127,7 @@ namespace BackEnd.Controllers
             };
 
             return Ok(result);
-        } 
+        }
 
         //Endpoint för att ta bort en bokning ur databasen med dess id, vet inte om vi ska
         // använda denna, eller om vi ska sätta en "avbokad" istället för att admin ska kunna
@@ -163,39 +164,39 @@ namespace BackEnd.Controllers
 
             return Ok(new { Message = $"Booking with id {id} was deleted" });
         }
-        
-[HttpGet("mybookings")]
-[Authorize]
-public async Task<IActionResult> GetAllMyBookings()
-{
-    // Hämta inloggad användares Id från token
-    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    if (string.IsNullOrEmpty(userId))
-        return Unauthorized("UserId not found in token.");
-
-    // Hämta bokningar där UserId matchar, hantera null och trim
-    var bookings = await _context.Bookings
-        .Where(b => b.UserId != null && b.UserId.Trim() == userId)
-        .Include(b => b.Resource)
-        .Include(b => b.TimeSlot)
-        .Include(b => b.User)
-        .Select(b => new BookingDTO
+        [HttpGet("mybookings")]
+        [Authorize]
+        public async Task<IActionResult> GetAllMyBookings()
         {
-            BookingId = b.BookingId,
-            Date = b.Date,
-            UserId = b.UserId ?? "",
-            UserName = b.User != null ? b.User.UserName : "",
-            ResourceId = b.ResourceId,
-            ResourceName = b.Resource != null ? b.Resource.Name : "",
-            TimeSlotId = b.TimeSlotId,
-            StartTime = b.TimeSlot != null ? b.TimeSlot.startTime.ToString(@"hh\:mm") : "",
-            EndTime = b.TimeSlot != null ? b.TimeSlot.endTime.ToString(@"hh\:mm") : ""
-        })
-        .ToListAsync();
+            // Hämta inloggad användares Id från token
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-    return Ok(bookings);
-}
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("UserId not found in token.");
+
+            // Hämta bokningar där UserId matchar, hantera null och trim
+            var bookings = await _context.Bookings
+                .Where(b => b.UserId != null && b.UserId.Trim() == userId)
+                .Include(b => b.Resource)
+                .Include(b => b.TimeSlot)
+                .Include(b => b.User)
+                .Select(b => new BookingDTO
+                {
+                    BookingId = b.BookingId,
+                    Date = b.Date,
+                    UserId = b.UserId ?? "",
+                    UserName = b.User != null ? b.User.UserName : "",
+                    ResourceId = b.ResourceId,
+                    ResourceName = b.Resource != null ? b.Resource.Name : "",
+                    TimeSlotId = b.TimeSlotId,
+                    StartTime = b.TimeSlot != null ? b.TimeSlot.startTime.ToString(@"hh\:mm") : "",
+                    EndTime = b.TimeSlot != null ? b.TimeSlot.endTime.ToString(@"hh\:mm") : ""
+                })
+                .ToListAsync();
+
+            return Ok(bookings);
+        }
 
     }
 }
