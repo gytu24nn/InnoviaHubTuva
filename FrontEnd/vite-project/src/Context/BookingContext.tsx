@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import * as signalR from "@microsoft/signalr";
+import { useUser } from "./UserContext";
 
 // Booking from backend (BookingDTO)
 export interface Booking {
@@ -50,9 +51,9 @@ const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
 export const BookingProvider = ({ children }: { children: ReactNode }) => {
   const [resourceId, setResourceId] = useState<number | null>(null);
-  const [date, setDate] = useState<Date | null>(null);
+  const [date, setDate] = useState<Date | null>(new Date());
   const [timeSlotId, setTimeSlotId] = useState<number | null>(null);
-
+  const { isLoggedIn, loading: userLoading } = useUser();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [resource, setResource] = useState<Resource[]>([]);
@@ -61,9 +62,19 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
 
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
-useEffect(() => {
+  useEffect(() => {
+
+    // Kolla inloggad status
+    if (userLoading || !isLoggedIn) {
+      if (!userLoading) {
+        setLoading(false); 
+      }
+      return;
+    }
+
   const fetchData = async () => {
     try {
+      setLoading(true);
       // 🔹 1. Fetch MyBookings (temporarily without token)
       const bookingsRes = await fetch("http://localhost:5099/api/user/public-bookings",{
         credentials: "include",
@@ -131,7 +142,7 @@ useEffect(() => {
     isMounted = false; 
     Newconnection.stop();
   };
-}, []);
+}, [isLoggedIn, userLoading]);
 
 useEffect(() => {
   if(!date || !resourceId || !connection) return; 
@@ -149,6 +160,12 @@ useEffect(() => {
     connection.off("ReceiveBookingsForResource", handler);
   }
 }, [date, resourceId, connection]);
+
+useEffect (() => {
+  if (resource.length > 0 && resourceId === null) {
+    setResourceId (resource[0].resourcesId);
+  }
+},[resource, resourceId]);
 
   return (
     <BookingContext.Provider
