@@ -20,8 +20,8 @@ const Booking = () => {
     setTimeSlotId,
     timeSlots,
     bookings,
-    // loading,
-    // error,
+    loading,
+    error,
     resource,
     resourceId,
     setResourceId
@@ -34,8 +34,15 @@ const Booking = () => {
   const resourceTypeId = resourceTypeIdParam ? Number(resourceTypeIdParam) : null;
   const resourceName = searchParams.get("resourceName");
   const [showMap, setShowMap] = useState(false);
-  // const { isLoggedIn, loading: userLoading } = useUser();
   
+    if (loading) {
+    return <div className="loading-message">Laddar...</div>;
+  }
+
+  if (error) {
+    return <div className="error-message">Ett fel uppstod: {error}</div>;
+  }
+
   // Handle calendar click
   const handleDateSelect = (slotInfo: { start: Date }) => {
     // Förhindra klick på förflutna datum
@@ -169,13 +176,6 @@ const handleConfirm = async () => {
 
     return {};
   };
-
-  useEffect(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  setDate(today);
-  setTimeSlotId(null);
-  }, []);
 
   return (
     <div className="booking-container">
