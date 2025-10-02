@@ -12,8 +12,12 @@ using Microsoft.OpenApi.Models;
 using BackEnd.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
+using DotNetEnv;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotNetEnv.Env.Load();
 
 // Add services to the container.
 
@@ -129,6 +133,15 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
+});
+
+builder.Services.AddHttpClient("openai", client =>
+{
+    client.BaseAddress = new Uri("https://api.openai.com/v1/");
+    var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+    client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
 });
 
 builder.Services.AddSignalR();
