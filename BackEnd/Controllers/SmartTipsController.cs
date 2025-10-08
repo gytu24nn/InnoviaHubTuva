@@ -1,7 +1,11 @@
 using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 using BackEnd.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackEnd.Controllers
 {
@@ -18,6 +22,8 @@ namespace BackEnd.Controllers
             _context = context;
         }
 
+        [HttpGet]
+        //[Authorize]
         public async Task<IActionResult> SmartTips()
         {
             return Ok();
