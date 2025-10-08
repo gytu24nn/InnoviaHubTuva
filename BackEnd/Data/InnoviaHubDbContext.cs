@@ -3,6 +3,7 @@ using BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using BackEnd.Models.AI;
 
 namespace BackEnd.Data;
 
@@ -17,18 +18,19 @@ public class InnoviaHubDbContext : IdentityDbContext<AppUser>
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<Resources> Resources { get; set; }
     public DbSet<ResourceType> ResourceTypes { get; set; }
+    public DbSet<AIChatMessage> AIChatMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         // Skapa en hasher-instans
-        var hasher = new PasswordHasher<AppUser>(); 
+        var hasher = new PasswordHasher<AppUser>();
 
         // Skapa admin-användaren
         var adminUser = new AppUser
         {
-            Id = "1", 
+            Id = "1",
             UserName = "admin",
             NormalizedUserName = "ADMIN",
             Email = "admin@example.com",
@@ -39,9 +41,9 @@ public class InnoviaHubDbContext : IdentityDbContext<AppUser>
         adminUser.PasswordHash = hasher.HashPassword(adminUser, "Admin123!");
 
         // Skapa user-användaren
-        var userUser = new AppUser 
+        var userUser = new AppUser
         {
-            Id = "2", 
+            Id = "2",
             UserName = "user",
             NormalizedUserName = "USER",
             Email = "user@example.com",
