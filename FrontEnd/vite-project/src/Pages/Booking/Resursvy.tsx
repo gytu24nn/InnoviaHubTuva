@@ -63,7 +63,10 @@ const Resursvy = () => {
                     <ul className="ResourceList">
                         {resources.map((r) => (
                             <li key={r.resourceTypeId} className="ResourceItem">
-                                <Link to={`/Booking?resourceId=${r.resourceTypeId}&resourceName=${encodeURIComponent(r.name)}`} className="ResourceItem-Link">
+                                <Link 
+                                     to={`/Booking?resourceTypeName=${encodeURIComponent(r.name)}&resourceName=${encodeURIComponent(r.name)}`}
+                                     className="ResourceItem-Link"
+                                >
                                     <i className="fa-solid fa-star"></i>
                                     {r.name}
                                 </Link>

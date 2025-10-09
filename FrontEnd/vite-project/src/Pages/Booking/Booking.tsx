@@ -9,6 +9,7 @@ import "./booking.css"
 import "../../ErrorAndLoading.css"
 import OfficeLayout from "../../Components/OfficeLayout";
 import { set } from "date-fns";
+import SmartTips from "../../Components/SmartTips";
 
 const localizer = momentLocalizer(moment);
 
@@ -32,8 +33,12 @@ const Booking = () => {
   const [searchParams] = useSearchParams();
   const resourceTypeIdParam = searchParams.get("resourceTypeId");
   const resourceTypeId = resourceTypeIdParam ? Number(resourceTypeIdParam) : null;
-  const resourceName = searchParams.get("resourceName");
+  const resourceName = searchParams.get("resourceTypeName");
+  const ResourceTypeName = searchParams.get("resourceName");
   const [showMap, setShowMap] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [resourceIdLocal, setResourceIdLocal] = useState<number | null>(null);
+
   
     if (loading) {
     return <div className="loading-message">Laddar...</div>;
@@ -56,7 +61,8 @@ const Booking = () => {
       return; // förflutna datum blockeras
     }
 
-    setDate(clickedDate); // spara valt datum
+    setDate(clickedDate);
+    setSelectedDate(clickedDate) // spara valt datum
     setTimeSlotId(null); // nollställ vald tid
   };
 
@@ -65,10 +71,10 @@ const Booking = () => {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes)
   }
 
-  const slotsForDay = date && resourceId 
+  const slotsForDay = date && resourceIdLocal
     ? timeSlots.map((slots) => {
       const isBooked = bookings.some((b) => {
-        if(b.resourceId !== resourceId || new Date(b.date).toDateString() !== date.toDateString()) {
+        if(b.resourceId !== resourceIdLocal || new Date(b.date).toDateString() !== date.toDateString()) {
           return false;
         }
 
@@ -116,21 +122,33 @@ const Booking = () => {
     "8h": slotsForDay.filter((s) => s.duration === 8),
   };
 
+  const freeSlotsCount = slotsForDay.filter(s => !s.isBooked).length;
+  const isFullyBooked = freeSlotsCount === 0;
+
   // Confirm booking flow
 const handleConfirm = async () => {
-  if (!date || !timeSlotId || !resourceId) {
+  if (!selectedDate || !timeSlotId || !resourceIdLocal) {
     alert("Välj ett datum, en tid och resurs innan du fortsätter.");
     return;
   }
 
   // Skapa boknings-objekt
-  const utcMidnight = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const utcMidnight = new Date(Date.UTC(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()));
   const bookingData = {
     date: utcMidnight.toISOString(),
-    resourceId: Number(resourceId),
+    resourceId: resourceIdLocal,
     timeSlotId: timeSlotId,
     // Lägg till fler fält om det behövs, t.ex. userId
   };
+
+  console.log("Booking data:", {
+  date: utcMidnight.toISOString(),
+  resourceId,
+  timeSlotId,
+});
+
+console.log("Available resources:", availableRescources);
+
 
   try {
     const response = await fetch("http://localhost:5099/api/booking", {
@@ -145,7 +163,7 @@ const handleConfirm = async () => {
     }
 
     setTimeSlotId(null);
-    setResourceId(null);
+    setResourceIdLocal(null);
 
     const result = await response.json();
     // Navigera till bekräftelsesida med boknings-id
@@ -198,12 +216,26 @@ const handleConfirm = async () => {
           />
       </div>
 
+      {date && !isFullyBooked && (
+        <SmartTips 
+          dateTips={selectedDate ? new Date(Date.UTC(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate())) : undefined}
+          resourceTypeTips={ResourceTypeName}
+          resourceIdTips={null} // AI ska inte få enskild resurs
+        />
+      )}
+
+      {date && isFullyBooked && (
+        <p className="availability-message">Tyvärr, alla tider är fullbokade denna dag 🙈</p>
+      )}
+
+      
+
           {/*välj en resurs*/}
             <label>Välj resurs:</label>
             <div>
               <select 
-                value={resourceId ?? ""}
-                onChange={(e) => setResourceId(Number(e.target.value))}
+                value={resourceIdLocal ?? ""}
+                onChange={(e) => setResourceIdLocal(Number(e.target.value))}
                 className="booking-resource-select"
               >
 

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using BackEnd.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ namespace BackEnd.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> SmartTips([FromQuery] string? ResourceType, [FromQuery] DateTime? date, [FromQuery] int? timeSlotId, [FromQuery] int? resourceId)
         {
             // Kolla om user id finns i token.
@@ -71,9 +72,10 @@ namespace BackEnd.Controllers
             }
             else
             {
+                var targetDate = date.Value.Date;
                 // här samlar vi ihop alla bokningar på en dag till en lista då den dagen användaren valt.
                 var bookingsForday = bookings
-                    .Where(b => b.Date.Date == date.Value.Date)
+                    .Where(b => b.Date.Date == targetDate)
                     .ToList();
 
                 // Hämtar alla resurser från databasen för att kunna se vilka resurser som är lediga för att kunna ge så passande tips som möjligt. 
@@ -84,8 +86,9 @@ namespace BackEnd.Controllers
                     .Where(r => !bookingsForday.Any(b => b.ResourceId == r.ResourcesId))
                     .ToList();
 
-                // Här är en if stats för att föreslå en resurs för användaren och om inga lediga resurser finns den dag skriva ut de. 
-                string suggestedResource = freeResources.Any() ? freeResources.First().Name : "inga lediga resurser";
+                // Istället för suggestedResource
+                var selectedResource = await _context.Resources.FirstOrDefaultAsync(r => r.ResourcesId == resourceId);
+                string resourceName = selectedResource?.Name ?? "resurs";
 
                 // Först hämtas alla timeslots. 
                 var allTimeSlots = await _context.TimeSlots.ToListAsync();
@@ -114,15 +117,16 @@ namespace BackEnd.Controllers
 
                 // Här skrivs informationen in i prompten som sen används i content för att ai ska veta hur den ska skriva ut tipset.
                 prompt = $@"
-                Du är en rolig och trevlig assistent för InnoviaHubs bokningssystem 🎉
+                Du är en trevlig assistent för InnoviaHubs bokningssystem 🎉
 
                 Här är bokningsinformationen:
-                - Resurstyp: {ResourceType ?? "okänd"}  
-                - Datum: {date?.ToString("yyyy-MM-dd")}  
-                - Lediga resurs att föreslå: {suggestedResource}
-                - Status för vald dag: {bookingStatus}
+                - Datum: {date:yyyy-MM-dd} (använd exakt detta datum)
+                - Resurs: {resourceName} (använd exakt detta namn)
+                - Beskriv inte andra dagar eller resurser
+                - Använd endast emojis, inga egna datum eller namn
 
-                Ge användaren ett **kort och personligt tips** (1–2 meningar) för just denna resurstyp och dag.  
+
+                Ge användaren ett **kort och personligt tips** (1–2 meningar).  
                 Om det är många bokningar, föreslå ett lugnare alternativ.  
                 Om det är få bokningar, uppmuntra användaren att boka!  
                 Använd emojis och en glad ton, men håll det kort och relevant.  
