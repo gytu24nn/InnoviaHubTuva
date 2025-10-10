@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
@@ -27,7 +28,7 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> SmartTips([FromQuery] string? ResourceType, [FromQuery] DateTime? date, [FromQuery] int? timeSlotId, [FromQuery] int? resourceId)
+        public async Task<IActionResult> SmartTips([FromQuery] string? ResourceType, [FromQuery] DateTime? date, [FromQuery] int? resourceId)
         {
             // Kolla om user id finns i token.
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier)?.Trim();
@@ -43,16 +44,40 @@ namespace BackEnd.Controllers
                 return Ok(new { tip = "Det finns inga bokningar ännu - passa på att boka när som helst" });
             }
 
+            var today = DateTime.Today;
+
             // samla ihop data i grupper.
             var BookingsGrouped = bookings
-                .GroupBy(b => b.Date.Date)
+                .Where(b => b.Date.ToLocalTime().Date >= today) // Endast idag eller framåt
+                .GroupBy(b => b.Date.ToLocalTime().Date)
                 .Select(g => new { Date = g.Key, count = g.Count() })
-                .OrderBy(g => g.count)
                 .ToList();
-            
-            //Här sorteras bokningar efter datum och används sen i prompt för att skriva ut tips
-            var leastBusyDayInWeek = BookingsGrouped.First().Date.ToString("dddd, dd MMMM");
-            var mostBusyDayInWeek = BookingsGrouped.Last().Date.ToString("dddd, dd MMMM");
+
+            if (BookingsGrouped.Count == 0)
+            {
+                // Detta hanteras redan ovan men kan vara en bra "fallback"
+                return Ok(new { tip = "Inga framtida bokningar ännu, passa på att boka när det passar dig! 🌟" });
+            }
+
+            // Hitta dagen med minst bokningar bland de framtida
+            var leastBusyDay = BookingsGrouped
+                .OrderBy(g => g.count)      // Sortera efter lägst antal bokningar
+                .ThenBy(g => g.Date)        // Välj det tidigaste datumet om det är lika antal
+                .First();
+
+            // Hitta dagen med mest bokningar bland de framtida
+            var mostBusyDay = BookingsGrouped
+                .OrderByDescending(g => g.count) // Sortera efter högst antal bokningar
+                .ThenBy(g => g.Date)             // Välj det tidigaste datumet om det är lika antal
+                .First();
+
+            var swedishCulture = new CultureInfo("sv-SE");
+
+            var leastBusyDayInWeek = leastBusyDay.Date
+                .ToString("dddd dd MMMM", swedishCulture);
+
+            var mostBusyDayInWeek = mostBusyDay.Date
+                .ToString("dddd dd MMMM", swedishCulture);
 
             string prompt;
 
@@ -61,13 +86,14 @@ namespace BackEnd.Controllers
             {
                 prompt = $@"
                     Du är en rolig och trevlig assistent för InnoviaHubs bokningssystem.
+                    
                     Resurstyp: {ResourceType ?? "Valfri resurs"}
 
                     - Mest bokade i veckan: {mostBusyDayInWeek} 
                     - Minst bokade i veckan: {leastBusyDayInWeek}
 
                     Baserat på bokningsdata, ge ett kort personligt tips till användaren om vilken dag som kan vara bra att boka.
-                    Håll tipset kort och använd gärna roliga och gulliga emojis. 
+                    Håll tipset kort och använd gärna roliga och gulliga emojis. Ge tips endast på framtida dagar ignorera dagar som redan passerat.
                 ";
             }
             else
@@ -78,14 +104,6 @@ namespace BackEnd.Controllers
                     .Where(b => b.Date.Date == targetDate)
                     .ToList();
 
-                // Hämtar alla resurser från databasen för att kunna se vilka resurser som är lediga för att kunna ge så passande tips som möjligt. 
-                var allResources = await _context.Resources.ToListAsync();
-
-                // Filtrerar ut de resurser som inte är bokade den valda dagen. 
-                var freeResources = allResources
-                    .Where(r => !bookingsForday.Any(b => b.ResourceId == r.ResourcesId))
-                    .ToList();
-
                 // Istället för suggestedResource
                 var selectedResource = await _context.Resources.FirstOrDefaultAsync(r => r.ResourcesId == resourceId);
                 string resourceName = selectedResource?.Name ?? "resurs";
@@ -93,42 +111,22 @@ namespace BackEnd.Controllers
                 // Först hämtas alla timeslots. 
                 var allTimeSlots = await _context.TimeSlots.ToListAsync();
 
-                // Här filtreras de timeslots som inte är bokade den valda dagen. 
-                var bookedSlots = bookingsForday
-                    .Where(b => b.ResourceId == resourceId)
-                    .Select(b => b.TimeSlotId)
-                    .ToList();
-
-                // Väljer den första lediga timesloten av de som är lediga. 
-                var availableSlot = allTimeSlots
-                    .FirstOrDefault(ts => !bookedSlots.Contains(ts.TimeSlotsId));
-                
-                // För att ai ska förstå så skrivs den lediga timesloten om så den förstår eller meddelar att det inte finns några.
-                string slotInfo = availableSlot != null ? $"{availableSlot.startTime:hh\\:mm}-{availableSlot.endTime:hh\\:mm}" : "inga lediga tider";
-
                 // Här sammanfattas nu bokningssatus för dagen baserat på antalet bokningar.
                 string bookingStatus = bookingsForday.Count == 0 ? "inga bokningar alls" : bookingsForday.Count < 3 ? "Några bokningar" : "Ganska fullt";
-
-                // Skapar en lista med antal bokningar per datum (kan användas för statestik framåt)
-                var allBookingSummary = bookings
-                    .GroupBy(b => b.Date.Date)
-                    .Select(g => $"{g.Key:yyyy-MM-dd}: {g.Count()} bokningar")
-                    .ToList();
 
                 // Här skrivs informationen in i prompten som sen används i content för att ai ska veta hur den ska skriva ut tipset.
                 prompt = $@"
                 Du är en trevlig assistent för InnoviaHubs bokningssystem 🎉
 
                 Här är bokningsinformationen:
-                - Datum: {date:yyyy-MM-dd} (använd exakt detta datum)
+                - Datum: {date:yyyy-MM-dd} (använd exakt detta datum och skriv det inte om)
                 - Resurs: {resourceName} (använd exakt detta namn)
-                - Beskriv inte andra dagar eller resurser
-                - Använd endast emojis, inga egna datum eller namn
-
+                - Bokningsstatus: {bookingStatus}
 
                 Ge användaren ett **kort och personligt tips** (1–2 meningar).  
-                Om det är många bokningar, föreslå ett lugnare alternativ.  
-                Om det är få bokningar, uppmuntra användaren att boka!  
+                - Om det är många bokningar, föreslå ett lugnare alternativ.  
+                - Om det är få bokningar, uppmuntra användaren att boka!  
+                - Skriv endast om datumet ovan.  
                 Använd emojis och en glad ton, men håll det kort och relevant.  
                 ";
             }

@@ -10,6 +10,7 @@ import "../../ErrorAndLoading.css"
 import OfficeLayout from "../../Components/OfficeLayout";
 import { set } from "date-fns";
 import SmartTips from "../../Components/SmartTips";
+import "../../Components/SmartTips.css";
 
 const localizer = momentLocalizer(moment);
 
@@ -195,6 +196,11 @@ console.log("Available resources:", availableRescources);
     return {};
   };
 
+  // Hitta den nu valda resursen baserat på ID:t i local state
+const currentSelectedResource = resource.find(r => r.resourcesId === resourceIdLocal);
+// Använd resursens namn, eller en fallback om ingen resurs är vald/hittad
+const currentResourceName = currentSelectedResource ? currentSelectedResource.name : 'den valda resursen';
+
   return (
     <div className="booking-container">
       <h1 className="booking-title">Boka en tid för {resourceName}</h1>
@@ -225,7 +231,17 @@ console.log("Available resources:", availableRescources);
       )}
 
       {date && isFullyBooked && (
-        <p className="availability-message">Tyvärr, alla tider är fullbokade denna dag 🙈</p>
+        <div className="SmartTipsContainer">
+            <div className="AI-icon">
+                <i className="fa-solid fa-robot"></i>
+            </div>
+
+            <div className="TextContent-smartTips">
+              <h3>SmartTips</h3>
+              <p className="tip-smartTips">Tyvärr, alla tider är fullbokade för {currentResourceName} just idag. Prova en annan resurs i rullistan eller byt dag 🙈</p>
+            </div>
+        
+        </div>
       )}
 
       
