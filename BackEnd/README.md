@@ -23,7 +23,14 @@ dotnet restore
 dotnet ef database update
 ```
 
-4. **Run the backend server:**
+4. **Create a `.env` file in the backend folder to enable AI functionality:**
+
+Add following line in the `.env` file and replace it with your OPENAI API-key: 
+```env
+OPENAI_API_KEY="YOURE_OPENAI_API_KEY"
+```
+
+5. **Run the backend server:**
 ```bash
 dotnet watch --urls=http://localhost:5099/
 ```
