@@ -30,7 +30,14 @@ const Home = () => {
           så kan du enkelt boka resurser och hantera dina bokningar.
         </p>
       </div>
-     
+
+      <div className="SmartTips-section">
+        <h3 className="SmartTipsText">Upptäck våra SmartTips!</h3>
+        <p className="InfoText">
+          Med SmartTips får du hjälp i bokningssystemet att hitta de lugnaste dagarna i veckan – perfekt innan du valt datum.
+          När du har valt ett datum och en specifik resurs får du AI-genererade tips om hur dagen ser ut, så att du kan boka smartare och enklare. ✨🤖
+        </p>
+      </div>
 
       <div className="Icons">
 
@@ -42,6 +49,12 @@ const Home = () => {
         <div className="IconBox">
           <i className="fa-solid fa-list-check"></i>
           <h3>Mina bokningar</h3>
+        </div>
+
+        <div className="IconBox">
+          <i className="fa-solid fa-robot"></i>
+          <h3>SmartTips</h3>
+
         </div>
       </div>
 

@@ -10,7 +10,11 @@
     width: 100%;
     overflow: hidden;
     border-radius: 8px;
-    margin-bottom: 1rem;
+
+}
+
+.SmartTips-section {
+    margin-bottom: 2rem;
 }
 
 .HeroImage {

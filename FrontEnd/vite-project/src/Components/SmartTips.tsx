@@ -53,8 +53,11 @@ const SmartTips = ({resourceTypeTips, timeSlotIdTips, dateTips, resourceIdTips}:
 
     return (
         <div className="SmartTipsContainer">
-            <div className="AI-icon">
-                <i className={`fa-solid fa-robot ${robotWave ? "animate" : ""} `}></i>
+            <div className="AI-Icon-container">
+                <div className={`AI-icon ${robotWave ? "animate" : ""}`}>
+                    <i className={`fa-solid fa-robot`}></i>
+                </div>
+                
             </div>
 
             <div className="TextContent-smartTips">
