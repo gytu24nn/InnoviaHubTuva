@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../Context/UserContext";
-
+import "./SmartTips.css";
 
 interface SmartTipsProps {
     resourceTypeTips?: string | null, 
@@ -14,6 +14,7 @@ const SmartTips = ({resourceTypeTips, timeSlotIdTips, dateTips, resourceIdTips}:
     const { isLoggedIn, loading: userLoading } = useUser();
     const [error, setError] = useState("");
     const [loading, SetLoading] = useState(true);
+    const [robotWave, setrobotWave] = useState(false);
     
 
     useEffect(() => { 
@@ -34,6 +35,10 @@ const SmartTips = ({resourceTypeTips, timeSlotIdTips, dateTips, resourceIdTips}:
                 });
                 const data = await response.json();
                 SetSmartTips(data.tip);
+
+                setrobotWave(true);
+                setTimeout(() => setrobotWave(false), 800)
+
             } catch (err) {
                 setError((err as Error).message);
             } finally {
@@ -48,10 +53,15 @@ const SmartTips = ({resourceTypeTips, timeSlotIdTips, dateTips, resourceIdTips}:
 
     return (
         <div className="SmartTipsContainer">
-            <h2>SmartTips</h2>
-            <p>{smartTips}</p>
-            
+            <div className="AI-icon">
+                <i className={`fa-solid fa-robot ${robotWave ? "animate" : ""} `}></i>
+            </div>
 
+            <div className="TextContent-smartTips">
+                <h3 className="Header-smartTips">SmartTips</h3>
+                <p className="tip-smartTips">{smartTips}</p>
+            </div>
+            
         </div>
     )
 }

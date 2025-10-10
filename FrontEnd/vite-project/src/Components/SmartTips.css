@@ -1,0 +1,74 @@
+.SmartTipsContainer {
+    background-color: #39D57A;
+    border-radius: 15px;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-right: 15px;
+    display: flex;
+    align-items: center;
+    min-height: 80px;
+    align-items: stretch;
+}
+
+.AI-icon {
+    background-color: #e4e4e4;
+    border-radius: 15px;
+    flex: 0 0 80px; /* eller en annan fast bredd */
+    align-self: stretch; /* fyller alltid hela höjden */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fa-robot {
+    width: 80px;
+    height: 80px;
+    border-radius: 15px;
+    width: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color:#39D57A
+}
+
+
+.TextContent-smartTips {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 1rem;
+}
+
+.Header-smartTips {
+    display: flex;
+    color: #000;
+    font-family: "Hermeneus One";
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.tip-smartTips {
+    display: flex;
+    color: #000;
+    font-family: "Hepta Slab";
+    font-size: 0.9rem;
+    font-weight: 400;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+@keyframes robotWave {
+    0% {transform: rotate(0deg);}
+    25% {transform: rotate(-15deg);}
+    50% {transform: rotate(15deg);}
+    75% {transform: rotate(-15deg);}
+    100% {transform: rotate(0deg);}
+}
+
+.fa-robot.animate {
+    animation: robotWave 0.7s ease-in-out;
+}
