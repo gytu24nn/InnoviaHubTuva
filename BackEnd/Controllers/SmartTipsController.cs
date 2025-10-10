@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using BackEnd.Data;
+using BackEnd.Models.AI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -28,8 +29,13 @@ namespace BackEnd.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> SmartTips([FromQuery] string? ResourceType, [FromQuery] DateTime? date, [FromQuery] int? resourceId)
+        public async Task<IActionResult> SmartTips([FromQuery] smartTipsRequest request)
         {
+            // Hämtar värdena/variablerna i klassen och sätter de till de lokala värdena. 
+            var ResourceType = request.ResourceType;
+            var date = request.Date;
+            var resourceId = request.ResourceId;
+
             // Kolla om user id finns i token.
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier)?.Trim();
             if (string.IsNullOrEmpty(userid))
@@ -44,6 +50,7 @@ namespace BackEnd.Controllers
                 return Ok(new { tip = "Det finns inga bokningar ännu - passa på att boka när som helst" });
             }
 
+            //Sätter dagens datum. 
             var today = DateTime.Today;
 
             // samla ihop data i grupper.
@@ -96,6 +103,7 @@ namespace BackEnd.Controllers
                     Håll tipset kort och använd gärna roliga och gulliga emojis. Ge tips endast på framtida dagar ignorera dagar som redan passerat.
                 ";
             }
+            //Här samlar vi data och skickar den i prompten när användaren valt en dag för att få ett tips om dagen är lugn eller måna som bokat. 
             else
             {
                 var targetDate = date.Value.Date;
