@@ -232,9 +232,13 @@ const currentResourceName = currentSelectedResource ? currentSelectedResource.na
 
       {date && isFullyBooked && (
         <div className="SmartTipsContainer">
+          <div className="AI-Icon-container">
             <div className="AI-icon">
-                <i className="fa-solid fa-robot"></i>
+              <i className={`fa-solid fa-robot`}></i>
             </div>
+          </div>
+            
+
 
             <div className="TextContent-smartTips">
               <h3>SmartTips</h3>
