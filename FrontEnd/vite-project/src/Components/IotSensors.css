@@ -1,0 +1,96 @@
+.Sensor-container {
+    width: auto;
+    margin: 1rem auto;
+    padding: 1.5rem;
+    background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    min-width: 300px;
+    box-sizing: border-box;
+    text-align: center;
+    max-width: 90%;
+}
+
+.Sensor-Title {
+    color: #000;
+    font-family: "Hermeneus One";
+    font-size: 2.5rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    margin-bottom: 2rem;
+    border-bottom: 3px solid #eef4ff;
+    display: inline-block;
+    position: relative;
+}
+
+.Sensor-Title::after {
+    content: "📡";
+    position: absolute;
+    right: -4rem;
+    margin-top: -0.7rem;
+    animation: pulseSignal 2s infinite ease-in-out;
+}
+
+@keyframes pulseSignal {
+    0%, 100% {opacity: 0.7; transform: scale(1);}
+    50% {opacity: 1; transform: scale(1.2);}
+}
+
+.Sensor-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.Sensor-list-item {
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Sensor-list-item:hover  {
+    background-color: #eef4ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+}
+
+.Sensor-status-online {
+    color: #1faa00;
+    font-weight: 600;
+    padding: 0.3rem;
+}
+
+.Sensor-status-offline {
+    color: #d32f2f;
+    font-weight: 600;
+    padding: 0.3rem;
+}
+
+@media (max-width: 600px)
+{
+    .Sensor-container {
+        /* max-width: 70%; */
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (min-width: 900px)
+{
+    .Sensor-container {
+        max-width: 50%;
+        padding: 1.5rem;
+        margin: 2rem auto;
+    }
+    .Sensor-Title {
+        font-size: 3rem;
+    }
+}

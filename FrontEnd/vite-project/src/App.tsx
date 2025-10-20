@@ -15,6 +15,7 @@ import { BookingProvider } from "./Context/BookingContext";
 import { UserProvider, useUser } from './Context/UserContext'; 
 import ProtectedRoute from "./Components/ProtectedRoute";
 import AdminRoute from './Components/AdminRoute';
+import IotSensors from './Components/IoTSensors';
 
 const AppContent = () => {
     const { loading: userLoading } = useUser();
@@ -30,6 +31,7 @@ const AppContent = () => {
 
             <Route element={<Layout />}>
                 <Route path='/Admin' element={<AdminRoute><Admin /></AdminRoute>} />
+                <Route path='/Sensor' element={<ProtectedRoute><IotSensors/></ProtectedRoute>} />
                 <Route path='/MyBookings' element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
                 <Route path='/Resursvy' element={<ProtectedRoute><Resursvy /></ProtectedRoute>} />
                 <Route path='/Home' element={<ProtectedRoute><Home /></ProtectedRoute>} />
