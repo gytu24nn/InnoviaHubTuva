@@ -32,23 +32,27 @@ const IotSensors = () => {
             try {
                 //Loading state medans sensor info hämtas
                 setLoading(true);
+                // Hämtar tenant-data (kund/organisation) baserat på en slug (här: "innovia").
                 const IotTenant = await fetch("http://localhost:5101/api/tenants/by-slug/innovia");
 
-                // KONTROLLERA OM HÄMTNING AV TENANT LYCKADES
+                // Kontrollerar om hämtning av tenant lyckades.
                 if (!IotTenant.ok) {
                     // Om 404, 500 etc.
                     throw new Error(`Kunde inte hitta tenant 'innovia'. Status: ${IotTenant.status}`);
                 }
                 const tenant = await IotTenant.json();
 
+                // Hämtar alla enheter (devices) som tillhör den aktuella tenant:en. 
                 const IotTenantDevices = await fetch(`http://localhost:5101/api/tenants/${tenant.id}/devices`);
                 
+                // Kontrollerar om hämning av devices lyckades om inte 404 eller 500 bland annat.
                 if(!IotTenantDevices.ok)
                 {
                     throw new Error(`Kunde inte hämta enheter för tenant ${tenant.id}. Status: ${IotTenantDevices.status}`)
                 }
-
                 const data = await IotTenantDevices.json();
+                // Här sätts datan man fetchat in i ett usestate/variabel.
+                // Konverterar svaret till JSON och sparar i state.
                 setDevices(data);
             } catch (err) {
                 console.error("Error fetching tenants or tenants devices.", err);
@@ -58,19 +62,25 @@ const IotSensors = () => {
             }
         };
 
+        // Kör funktionen som hämtar sensorer.
         fetchIoTSensors();
         
-        // Här ansluter jag till signalR för att ta emot mätvärden från simulatorn.
+          // Skapar en SignalR-anslutning för att ta emot realtidsdata från sensorerna.
         const connectionIot = new signalR.HubConnectionBuilder()
             .withUrl("http://localhost:5103/hub/telemetry")
             .withAutomaticReconnect()
             .build();
         
+            // lyssnar på eventet measurmentReceived som skickas från SignalR 
+            // varje gång en ny mätning tas emot, uppdateras statet med de senaste mätningarna.
         connectionIot.on("measurementReceived", (m: Measurment) => {
             console.log("Mätning mottagen:", m); 
             setLatestMeasurements(prev => ({ ...prev, [m.deviceId]: m }));
         });
 
+        // Här startas signalR-anslutningen. 
+        // När anslutningen är igång anropar vi moetoden jointentant på servern
+        // För att ansluta os till rätt tenant och ta emot alla relevanta sensorer.
         connectionIot
             .start()
             .then(() => {
@@ -79,6 +89,8 @@ const IotSensors = () => {
             })
             .catch(err => console.error("SignalR-fel:", err));
         
+         // Den här return-funktionen körs när komponenten tas bort från DOM:en.
+        // Den stänger anslutningen till SignalR-hubben för att undvika minnesläckor.
         return () => {
             connectionIot.stop();
         };
@@ -93,7 +105,7 @@ const IotSensors = () => {
             <h2 className="Sensor-Title">Sensorer:</h2>
             <ul className="Sensor-list">
                 {devices.map(device => {
-                     const measurement = latestMeasurements[device.id];
+                     const measurement = latestMeasurements[device.id]; // Hämtar senaste mätning för den här enheten
                     return (
                         <li key={device.id} className={`Sensor-list-item ${latestMeasurements[device.id] ? "updated" : ""}`}>
                             <strong className="Sensor-list-item-Title">
