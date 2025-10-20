@@ -2,7 +2,7 @@
     width: auto;
     margin: 1rem auto;
     padding: 1.5rem;
-    background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
+    background-color: #E4E4E4;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     min-width: 300px;
@@ -19,7 +19,7 @@
     font-weight: 600;
     line-height: normal;
     margin-bottom: 2rem;
-    border-bottom: 3px solid #eef4ff;
+    border-bottom: 3px solid white;
     display: inline-block;
     position: relative;
 }
