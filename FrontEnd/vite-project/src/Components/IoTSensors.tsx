@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import * as signalR from "@microsoft/signalr";
 import "./IotSensors.css";
+import "../ErrorAndLoading.css";
 
 interface Device {
     id: string;
@@ -84,8 +85,8 @@ const IotSensors = () => {
     }, []);
 
 
-    if(loading) return <p>Laddar sensorer...</p>
-    if (error) return <p>Fel: {error}</p>;
+    if(loading) return <p className="loading-message">Laddar sensorer...</p>
+    if (error) return <p className="error-message">{error}</p>;
 
     return (
         <div className="Sensor-container">

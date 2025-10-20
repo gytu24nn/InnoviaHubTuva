@@ -1,6 +1,6 @@
 import "./Home.css"
 import { Link, useNavigate } from "react-router-dom"
-import IotSensors from "../../Components/IoTSensors";
+import SensorSummary from "../../Components/SensorSummary";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -39,6 +39,8 @@ const Home = () => {
           När du har valt ett datum och en specifik resurs får du AI-genererade tips om hur dagen ser ut, så att du kan boka smartare och enklare. ✨🤖
         </p>
       </div>
+      
+      <SensorSummary/>
 
       <div className="Icons">
 
@@ -63,7 +65,7 @@ const Home = () => {
         Boka nu
       </button>
 
-      <IotSensors/>
+      
 
     </div>
   )
