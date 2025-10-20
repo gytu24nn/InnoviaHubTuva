@@ -51,6 +51,11 @@ const meny = ({isOpen}: MenuProps) => {
                     </Link>
                 </li>
                 <li>
+                    <Link className="linkMenuOption" to={"/Sensor"}>
+                        <i className="fa-solid fa-star"></i>Sensor
+                    </Link>
+                </li>
+                <li>
                 <button
                     type="button"
                     className="linkMenuOption as-button"

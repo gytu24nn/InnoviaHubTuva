@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import * as signalR from "@microsoft/signalr";
+import "./IotSensors.css";
 
 interface Device {
     id: string;
@@ -87,19 +88,24 @@ const IotSensors = () => {
     if (error) return <p>Fel: {error}</p>;
 
     return (
-        <div>
-            <h2>Sensorer:</h2>
-            <ul>
+        <div className="Sensor-container">
+            <h2 className="Sensor-Title">Sensorer:</h2>
+            <ul className="Sensor-list">
                 {devices.map(device => {
                      const measurement = latestMeasurements[device.id];
                     return (
-                        <li key={device.id}>
-                            <strong>{device.serial}</strong> ({device.model}) - {device.status}
-                            <div>
+                        <li key={device.id} className={`Sensor-list-item ${latestMeasurements[device.id] ? "updated" : ""}`}>
+                            <strong className="Sensor-list-item-Title">
+                                {device.model}: 
+                                <span className={device.status.toLowerCase() === "active" ? "Sensor-status-online" : "Sensor-status-offline"}>
+                                    ({device.status})
+                                </span>
+                            </strong>
+
+                            <div className="Sensor-list-item-measurements">
                                 {measurement ? (
                                     <>
-                                        {measurement.type}: {measurement.value.toFixed(2)} {measurement.unit} 
-                                        ({new Date(measurement.timestamp).toLocaleTimeString()})
+                                        <p className="measurements-info">{measurement.value.toFixed(2)} {measurement.unit}</p> 
                                     </>
                                 ) : (
                                     "Inga mätningar ännu"
