@@ -60,13 +60,13 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.08);
 }
 
-.Sensor-status-online {
+.Sensor-status-online, .value-yes {
     color: #1faa00;
     font-weight: 600;
     padding: 0.3rem;
 }
 
-.Sensor-status-offline {
+.Sensor-status-offline, .value-no {
     color: #d32f2f;
     font-weight: 600;
     padding: 0.3rem;

@@ -105,7 +105,23 @@ const IotSensors = () => {
             <h2 className="Sensor-Title">Sensorer:</h2>
             <ul className="Sensor-list">
                 {devices.map(device => {
-                     const measurement = latestMeasurements[device.id]; // Hämtar senaste mätning för den här enheten
+                    const measurement = latestMeasurements[device.id]; // Hämtar senaste mätning för den här enheten
+                    let displayValue = "-";
+
+                    if(measurement) {
+                        if(measurement.unit === "detections")
+                        {
+                            displayValue = measurement.value ? "Yes" : "No"
+                        } else if (typeof measurement.value === "number") {
+                            displayValue = measurement.value.toFixed(2)
+                        } 
+                        
+                        else {
+                            displayValue = String(measurement.value)
+                        }
+                    }
+
+
                     return (
                         <li key={device.id} className={`Sensor-list-item ${latestMeasurements[device.id] ? "updated" : ""}`}>
                             <strong className="Sensor-list-item-Title">
@@ -118,7 +134,8 @@ const IotSensors = () => {
                             <div className="Sensor-list-item-measurements">
                                 {measurement ? (
                                     <>
-                                        <p className="measurements-info">{measurement.value.toFixed(2)} {measurement.unit}</p> 
+                                        <p className={displayValue === "Yes" ? "value-yes" : displayValue === "No" ? "value-no" : "measurements-info"}>{displayValue} <i>{measurement.unit === "detections" ? "" : measurement.unit}</i></p> 
+                                        
                                     </>
                                 ) : (
                                     "Inga mätningar ännu"
