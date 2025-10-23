@@ -109,13 +109,15 @@ const IotSensors = () => {
                     let displayValue = "-";
 
                     if(measurement) {
-                        if(measurement.unit === "detections")
+                        if(measurement.unit === "detections" || measurement.unit === "motions")
                         {
-                            displayValue = measurement.value ? "Yes" : "No"
-                        } else if (typeof measurement.value === "number") {
+                            displayValue = measurement.value > 0.5 ? "Detected" : "Undetected"
+                        } else if (measurement.unit === "Waterleak") {
+                            displayValue = measurement.value > 0.5 ? "Yes" : "No"
+                        }
+                        else if (typeof measurement.value === "number") {
                             displayValue = measurement.value.toFixed(2)
                         } 
-                        
                         else {
                             displayValue = String(measurement.value)
                         }
@@ -134,7 +136,15 @@ const IotSensors = () => {
                             <div className="Sensor-list-item-measurements">
                                 {measurement ? (
                                     <>
-                                        <p className={displayValue === "Yes" ? "value-yes" : displayValue === "No" ? "value-no" : "measurements-info"}>{displayValue} <i>{measurement.unit === "detections" ? "" : measurement.unit}</i></p> 
+                                        <p className={
+                                            displayValue === "Detected" ? "value-green" 
+                                            : displayValue === "Undetected" ? "value-red"
+                                            : displayValue === "Yes" ? "value-red"
+                                            : displayValue === "No" ? "value-green"
+                                            : "measurements-info"
+                                        }>
+                                            {displayValue} <i>{measurement.unit === "detections" || measurement.unit === "Waterleak" || measurement.unit === "motions" ? "" : measurement.unit}</i>
+                                        </p> 
                                         
                                     </>
                                 ) : (
