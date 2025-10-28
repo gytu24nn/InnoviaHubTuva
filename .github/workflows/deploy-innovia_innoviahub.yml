@@ -1,68 +1,91 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - InnoviaHub
+name: Build and deploy Vite React to Azure Web App - InnoviaKitteFront
 
 on:
   push:
-    branches:
-      - Deploy-Innovia
+    branches: [ deploy ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
+
+    defaults:
+      run:
+        working-directory: FrontEnd/vite-project
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
+      - name: Use Node 20
+        uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: 20
 
-      - name: Install dependencies and build frontend
+      - name: Install & Build (Vite)
+        env:
+          VITE_API_URL: innoviahubtuva-debdbqgjg9bjaafh.swedencentral-01.azurewebsites.net
         run: |
-          cd FrontEnd/vite-project
-          npm install
+          npm ci
           npm run build
-          npm run test --if-present
-      
-      - name: Upload artifact for deployment job
+      - name: Add SPA web.config (IIS rewrite)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <system.webServer>
+              <rewrite>
+                <rules>
+                  <rule name="SPA Fallback" stopProcessing="true">
+                    <match url=".*" />
+                    <conditions logicalGrouping="MatchAll">
+                      <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+                      <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+                    </conditions>
+                    <action type="Rewrite" url="/index.html" />
+                  </rule>
+                </rules>
+              </rewrite>
+              <staticContent>
+                <remove fileExtension=".json" />
+                <mimeMap fileExtension=".json" mimeType="application/json" />
+              </staticContent>
+            </system.webServer>
+          </configuration>
+          "@ | Out-File -FilePath dist/web.config -Encoding utf8
+      - name: Upload artifact (dist only)
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-build
+          name: frontend-dist
           path: FrontEnd/vite-project/dist
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download built artifact
         uses: actions/download-artifact@v4
         with:
-          name: frontend-build
-      
+          name: frontend-dist
+          path: dist
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FB627EB55DEE42E1851C30E89B7E73BD }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EEFB502D91F94E3CA57A9E50A7AB8299 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F282ABDC704F4FA79FC4FD016DD6631B }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4C8FE4E223DF418F9599FB8C1CF5E38E }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_213AD4DB6CD14316A578BB94F4931B47 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_35E6E0B037EE4AA18AC018BB7925114D }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App (dist/)
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
-          app-name: 'InnoviaHub'
-          slot-name: 'Production'
-          package: FrontEnd/vite-project/dist
-
-          
-
+          app-name: InnoviaKitteFront
+          slot-name: Production
+          package: dist
