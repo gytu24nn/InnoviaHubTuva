@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { BASE_URL } from "../config";
 
 type User = {
   id: string;
@@ -20,11 +21,12 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const apiBase = BASE_URL;
 
   const fetchUser = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/me", {
+      const response = await fetch(`${BASE_URL}/api/auth/me`, {
         credentials: "include",
         });
 

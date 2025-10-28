@@ -4,6 +4,7 @@ import "../../ErrorAndLoading.css"
 import "./MyBookings.css"
 import OfficeLayout from '../../Components/OfficeLayout'
 import "../Booking/booking.css"
+import { BASE_URL } from '../../config'
 
 type Booking = {
   bookingId: number;
@@ -17,7 +18,7 @@ type Booking = {
 };
 
 const MyBookings = () => {
-  const apiBase = "http://localhost:5099/api/Booking";
+  const apiBase = `${BASE_URL}/api/Booking`;;
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
