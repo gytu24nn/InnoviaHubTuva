@@ -43,6 +43,13 @@ const Booking = () => {
 
   const apiBase = `${BASE_URL}/api/booking`
 
+  useEffect(() => {
+    if (resource.length > 0 && resourceIdLocal === null) {
+      // Sätt resourceIdLocal till första resursen i listan
+      setResourceIdLocal(resource[0].resourcesId);
+    }
+  }, [resource, resourceIdLocal]);
+
   
     if (loading) {
     return <div className="loading-message">Laddar...</div>;
