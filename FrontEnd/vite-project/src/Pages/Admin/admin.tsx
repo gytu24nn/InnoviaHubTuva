@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./Admin.css"
 import "../../ErrorAndLoading.css"
 import { useUser } from "../../Context/UserContext";
+import { BASE_URL } from "../../config";
 
 const admin = () => {
     const {isAdmin} = useUser();
@@ -53,8 +54,9 @@ const admin = () => {
     const [showResources, setShowResources] = useState(false);
     const [showAddResourceForm, setShowAddResourceForm] = useState(false);
 
-    const apiBase = "/api"; 
+    const apiBase = `${BASE_URL}/api`; 
     const adminApiBase = `${apiBase}/admin`;
+    const resourceApiBase = `${apiBase}/resource`;
 
     // Hämta alla resurser
     const fetchResources = async () => {
@@ -91,7 +93,7 @@ const admin = () => {
 
     const fetchResourceTypes = async () => {
         try {
-            const response = await fetch(`${apiBase}/resource/resourcetypes`, { credentials: 'include' });
+            const response = await fetch(`${resourceApiBase}/resourcetypes`, { credentials: 'include' });
             if (!response.ok) { throw new Error('Kunde inte hämta resurstyper.'); }
             const data: ResourceType[] = await response.json();
             setResourceTypes(data);

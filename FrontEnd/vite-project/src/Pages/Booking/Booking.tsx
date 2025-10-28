@@ -11,6 +11,7 @@ import OfficeLayout from "../../Components/OfficeLayout";
 import { set } from "date-fns";
 import SmartTips from "../../Components/SmartTips";
 import "../../Components/SmartTips.css";
+import { BASE_URL } from "../../config";
 
 const localizer = momentLocalizer(moment);
 
@@ -39,6 +40,8 @@ const Booking = () => {
   const [showMap, setShowMap] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [resourceIdLocal, setResourceIdLocal] = useState<number | null>(null);
+
+  const apiBase = `${BASE_URL}/api/booking`
 
   
     if (loading) {
@@ -152,7 +155,7 @@ console.log("Available resources:", availableRescources);
 
 
   try {
-    const response = await fetch("http://localhost:5099/api/booking", {
+    const response = await fetch(`${apiBase}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(bookingData),
