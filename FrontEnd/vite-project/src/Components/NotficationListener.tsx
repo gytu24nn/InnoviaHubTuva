@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./NotificationsListener.css"
 import * as signalR from "@microsoft/signalr";
+import { BASE_URL } from "../config";
 
 type Notif = { title: string; message: string; sentAt?: string; id: string };
 
@@ -8,9 +9,11 @@ export default function NotificationListener() {
     const [items, setItems] = useState<Notif[]>([]);
     const connRef = useRef<signalR.HubConnection | null>(null);
 
+    const apiBase = BASE_URL;
+
     useEffect(() => {
         const conn = new signalR.HubConnectionBuilder()
-            .withUrl("/NotificationHub", { withCredentials: true })
+            .withUrl(`${BASE_URL}/NotificationHub`, { withCredentials: true })
             .withAutomaticReconnect()
             .build();
 
@@ -25,7 +28,7 @@ export default function NotificationListener() {
     }); 
 
     const bookingConn = new signalR.HubConnectionBuilder()
-        .withUrl("/BookingHub", { withCredentials: true })
+        .withUrl(`${BASE_URL}/BookingHub`, { withCredentials: true })
         .withAutomaticReconnect()
         .build();
     

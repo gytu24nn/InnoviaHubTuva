@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import * as signalR from "@microsoft/signalr";
 import { useUser } from "./UserContext";
+import { BASE_URL } from "../config";
 
 // Booking from backend (BookingDTO)
 export interface Booking {
@@ -62,6 +63,8 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
 
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
+  const apiBase = `${BASE_URL}/api`
+
   useEffect(() => {
 
     // Kolla inloggad status
@@ -76,7 +79,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       // 🔹 1. Fetch MyBookings (temporarily without token)
-      const bookingsRes = await fetch("http://localhost:5099/api/user/public-bookings",{
+      const bookingsRes = await fetch(`${apiBase}/user/public-bookings`,{
         credentials: "include",
       });
       if (!bookingsRes.ok) {
@@ -85,7 +88,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
       const bookingsData: Booking[] = await bookingsRes.json();
       setBookings(bookingsData);
 
-      const resourcesRes = await fetch("http://localhost:5099/api/Resource/available", {
+      const resourcesRes = await fetch(`${apiBase}/Resource/available`, {
         credentials: "include",
       });
       if(!resourcesRes.ok) {
@@ -95,7 +98,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
       setResource(resourcesData)
 
       // 🔹 2. Fetch TimeSlots
-      const timeSlotsRes = await fetch("http://localhost:5099/api/user/timeslots", {
+      const timeSlotsRes = await fetch(`${apiBase}/user/timeslots`, {
         credentials: "include",
       });
       if (!timeSlotsRes.ok) {
@@ -118,7 +121,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   // 🔴 Real-time updates with SignalR
   let isMounted = true; 
   const Newconnection = new signalR.HubConnectionBuilder()
-    .withUrl("http://localhost:5099/bookingHub", {withCredentials: true})
+    .withUrl(`${BASE_URL}/bookingHub`, {withCredentials: true})
     .withAutomaticReconnect()
     .build();
 

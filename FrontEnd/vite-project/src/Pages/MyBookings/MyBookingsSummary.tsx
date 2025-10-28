@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../Booking/Resursvy.css"
 import "../../ErrorAndLoading.css"
+import { BASE_URL } from "../../config";
 
 type BookingType = {
     bookingId: number;
@@ -12,7 +13,7 @@ type BookingType = {
 }
 
 const MyBookingsSummary = () => {
-    const bookingApi = "http://localhost:5099/api/Booking";
+    const bookingApi = `${BASE_URL}/api/Booking`;
 
     const [bookings, setBookings] = useState<BookingType[]>([]);
     const [loading, setLoading] = useState(true);

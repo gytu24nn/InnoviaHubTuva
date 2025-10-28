@@ -4,6 +4,7 @@ import "./Resursvy.css"
 import MyBookingsSummary from "../MyBookings/MyBookingsSummary";
 import "../../ErrorAndLoading.css"
 import { useUser } from "../../Context/UserContext";
+import { BASE_URL } from "../../config";
 
 type ResourceType = {
     resourceTypeId: number;
@@ -11,7 +12,7 @@ type ResourceType = {
 }
 
 const Resursvy = () => {
-    const apiBase = "http://localhost:5099/api/Resource";
+    const apiBase = `${BASE_URL}/api/Resource`;
     const { isLoggedIn, loading: userLoading } = useUser();
     const [resources, setResources] = useState<ResourceType[]>([]);
     const [loading, setLoading] = useState(true);

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react"; // ✅ green checkmark icon
 import "./BookingConfirmed.css";
 // import { useUser } from "../../Context/UserContext";
+import { BASE_URL } from "../../config";
 
 interface BookingDetails {
   bookingId: number;
@@ -15,6 +16,7 @@ interface BookingDetails {
 }
 
 const BookingConfirmed = () => {
+  const apiBase = `${BASE_URL}/api/booking`;
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<BookingDetails | null>(null);
@@ -23,7 +25,7 @@ const BookingConfirmed = () => {
 useEffect(() => {
   const fetchBooking = async () => {
     try {
-      const res = await fetch(`http://localhost:5099/api/booking/${bookingId}`, {
+      const res = await fetch(`${apiBase}/${bookingId}`, {
         credentials: "include"
       });
       if (!res.ok) {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../Context/UserContext";
 import "./SmartTips.css";
+import { BASE_URL } from "../config";
 
 interface SmartTipsProps {
     resourceTypeTips?: string | null, 
@@ -15,6 +16,8 @@ const SmartTips = ({resourceTypeTips, timeSlotIdTips, dateTips, resourceIdTips}:
     const [error, setError] = useState("");
     const [loading, SetLoading] = useState(true);
     const [robotWave, setrobotWave] = useState(false);
+
+    const apiBase = BASE_URL
     
 
     useEffect(() => { 
@@ -29,7 +32,7 @@ const SmartTips = ({resourceTypeTips, timeSlotIdTips, dateTips, resourceIdTips}:
                     ...(timeSlotIdTips ? {timeSlotId: timeSlotIdTips?.toString()} : {})
                 });
 
-                const response = await fetch(`http://localhost:5099/api/SmartTips?${params.toString()}`, {
+                const response = await fetch(`${apiBase}/api/SmartTips?${params.toString()}`, {
                     method: "GET",
                     credentials: "include",
                 });

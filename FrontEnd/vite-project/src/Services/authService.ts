@@ -1,4 +1,5 @@
-const API = "http://localhost:5099";
+import { BASE_URL } from "../config";
+const API = BASE_URL;
 
 type LoginResponse = {
     id: string;
