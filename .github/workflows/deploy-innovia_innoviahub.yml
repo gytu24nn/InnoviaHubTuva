@@ -89,3 +89,4 @@ jobs:
           app-name: InnoviaHub
           slot-name: Production
           package: dist
+
