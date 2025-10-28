@@ -7,4 +7,4 @@
 export const BASE_URL =
     window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
     ? "http://localhost:5099"
-    : "innoviahubtuva-debdbqgjg9bjaafh.swedencentral-01.azurewebsites.net";
+    : "https://innoviahubtuva-debdbqgjg9bjaafh.swedencentral-01.azurewebsites.net";
