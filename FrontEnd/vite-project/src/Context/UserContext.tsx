@@ -30,17 +30,25 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         credentials: "include",
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            setUser({
-                id: data.id,
-                email: data.email,
-                roles: data.roles,
-                userName: data.username,
-            });
-            } else {
-            setUser(null);
-            }
+        if (!response.ok) {
+          // Om servern returnerar fel, läs som text för felsökning
+          const text = await response.text();
+          console.error("Unexpected response from /auth/me:", text);
+          setUser(null);
+          return;
+        }
+
+        // Om OK, läs som JSON
+        const data = await response.json();
+        setUser({
+          id: data.id,
+          email: data.email,
+          roles: data.roles,
+          userName: data.username,
+        });
+
+
+
     } catch (err) {
       console.error("Fel vid hämtning av användare:", err);
       setUser(null);
