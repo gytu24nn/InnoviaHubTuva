@@ -128,11 +128,22 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        builder => builder.WithOrigins("http://127.0.0.1:5173","http://localhost:5173", "https://innvoiafrontend-bfhzfqenfdh5b7d5.swedencentral-01.azurewebsites.net")
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://127.0.0.1:5173",
+                "http://localhost:5173",
+                "https://innvoiafrontend-bfhzfqenfdh5b7d5.swedencentral-01.azurewebsites.net"
+            )
+            .SetIsOriginAllowedToAllowWildcardSubdomains()
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials());
+            .WithExposedHeaders("Content-Disposition", "x-signalr-user-agent", "x-requested-with")
+            .AllowCredentials();
+
+    });
+            
 });
 
 builder.Services.AddHttpClient("openai", client =>
@@ -161,7 +172,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 // Här lägger du till statiska filer
 app.UseStaticFiles();
-
+app.UseRouting(); 
 app.UseCors("AllowFrontend"); // Använd CORS-policy
 
 app.UseAuthentication();

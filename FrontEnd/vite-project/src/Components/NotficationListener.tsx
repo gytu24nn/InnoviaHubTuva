@@ -13,7 +13,7 @@ export default function NotificationListener() {
 
     useEffect(() => {
         const conn = new signalR.HubConnectionBuilder()
-            .withUrl(`${BASE_URL}/NotificationHub`, { withCredentials: true })
+            .withUrl(`${apiBase}/NotificationHub`, { withCredentials: true })
             .withAutomaticReconnect()
             .build();
 
@@ -28,7 +28,7 @@ export default function NotificationListener() {
     }); 
 
     const bookingConn = new signalR.HubConnectionBuilder()
-        .withUrl(`${BASE_URL}/BookingHub`, { withCredentials: true })
+        .withUrl(`${apiBase}/BookingHub`, { withCredentials: true })
         .withAutomaticReconnect()
         .build();
     
