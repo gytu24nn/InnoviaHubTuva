@@ -138,10 +138,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   });
 
   Newconnection.start()
-    .then(() => {
-      console.log("SignalR connected");
-      setConnection(Newconnection);
-    })
+    .then(() => console.log("SignralR connected"))
     .catch((err) => console.error("SignalR error:", err));
 
   return () => {
@@ -153,12 +150,28 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
 useEffect(() => {
   if(!date || !resourceId || !connection) return; 
 
+  const dateString = date.toISOString().split('T')[0];
+
   connection
     .invoke("SendBookingsForResource", resourceId, date)
     .catch(err => console.error("Error invoking sendBookingsForResource:", err));
 
   const handler = (updatedBookings: Booking[]) => {
-    setBookings(updatedBookings);
+    setBookings((prevBookings) => {
+      
+      // 1. Filtrera bort ALLA bokningar som matchar den just nu valda resursen/dagen
+      const otherBookings = prevBookings.filter((b) => {
+        const bookingDateString = new Date(b.date).toISOString().split('T')[0];
+        
+        // Behåll bokningar som INTE matchar den valda resursen OCH dagen
+        return b.resourceId !== resourceId || bookingDateString !== dateString;
+      });
+
+      // 2. Kombinera övriga bokningar med de nya/uppdaterade bokningarna
+      // (Dessa nya uppdaterade bokningar är de som visas som röda/bokade på skärmen)
+      return [...otherBookings, ...updatedBookings];
+
+    });
   }
   connection.on("ReceiveBookingsForResource", handler);
 
