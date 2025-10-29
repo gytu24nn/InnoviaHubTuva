@@ -121,7 +121,7 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   // 🔴 Real-time updates with SignalR
   let isMounted = true; 
   const Newconnection = new signalR.HubConnectionBuilder()
-    .withUrl(`${BASE_URL}/bookingHub`, {withCredentials: true})
+    .withUrl(`${BASE_URL}/BookingHub`, {withCredentials: true})
     .withAutomaticReconnect()
     .build();
 
@@ -138,7 +138,10 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   });
 
   Newconnection.start()
-    .then(() => console.log("SignralR connected"))
+    .then(() => {
+      console.log("SignalR connected");
+      setConnection(Newconnection);
+    })
     .catch((err) => console.error("SignalR error:", err));
 
   return () => {

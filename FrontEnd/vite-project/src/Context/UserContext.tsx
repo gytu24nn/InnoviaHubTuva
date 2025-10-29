@@ -26,7 +26,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const fetchUser = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/me`, {
+      const response = await fetch(`${apiBase}/api/auth/me`, {
         credentials: "include",
         });
 
