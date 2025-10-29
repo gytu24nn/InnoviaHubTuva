@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import "../ErrorAndLoading.css";
 import "./SensorSummary.css";
+import { Inspect } from "lucide-react";
+import IotSensors from "./IoTSensors";
+
+const IOT_SERVER_OFFLINE_ERROR = "IOT_SERVER_OFFLINE";
 
 // Definierar typen för statistiken vi ska visa
 interface SensorSummaryProps {
@@ -50,7 +54,14 @@ const SensorSummary = () => {
                 });
             } catch (err) {
                 console.error(err);
-                setError(err instanceof Error ? err.message : "Ett fel uppstod.");
+
+                if(err instanceof TypeError && err.message.includes('Failed to fetch')) {
+                    setError(IOT_SERVER_OFFLINE_ERROR);
+                } else if (err instanceof Error) {
+                    setError(err.message)
+                } else {
+                    setError(err instanceof Error ? err.message : "Ett oväntat fel uppstod vid hämtning av sensorer.");
+                }
             } finally {
                 setLoading(false);
             }
@@ -61,35 +72,47 @@ const SensorSummary = () => {
     }, []);  // Tom array = körs endast en gång när komponenten mountas
 
     if(loading) return <p className="loading-message">Laddar sensorstatistik...</p>
-    if(error) return <p className="error-message">{error}</p>
 
     const { totalSensors, activeSensors, inactiveSensor} = stats;
 
     // Renderar statistik som kort (cards)
     return (
+
         <div className="SensorSummary">
-            <h2 className="SummaryTitle">Sensor översikt</h2>
+            {error ? (
+                error === IOT_SERVER_OFFLINE_ERROR ? (
+                    <p className="Sensor-list-offline">Kontorets sensorer är offline.</p>
+                ) : (
+                    <p className="error-message">{error}</p>
+                )
+            ): (
+                <div className="SensorSummary">
+                <h2 className="SummaryTitle">Sensor översikt</h2>
 
-            <div className="SummaryCards">
-                <div className="SummaryCard">
-                    <i className="fa-solid fa-microchip"></i>
-                    <h3>{totalSensors}</h3>
-                    <p>Totalt antal sensorer</p>
-                </div>
+                <div className="SummaryCards">
+                    <div className="SummaryCard">
+                        <i className="fa-solid fa-microchip"></i>
+                        <h3>{totalSensors}</h3>
+                        <p>Totalt antal sensorer</p>
+                    </div>
 
-                <div className="SummaryCard Active">
-                    <i className="fa-solid fa-signal"></i>
-                    <h3>{activeSensors}</h3>
-                    <p>Aktiva sensorer</p>
-                </div>
+                    <div className="SummaryCard Active">
+                        <i className="fa-solid fa-signal"></i>
+                        <h3>{activeSensors}</h3>
+                        <p>Aktiva sensorer</p>
+                    </div>
 
-                <div className="SummaryCard inactive">
-                    <i className="fa-solid fa-power-off"></i>
-                    <h3>{inactiveSensor}</h3>
-                    <p>Inaktiva sensorer</p>
+                    <div className="SummaryCard inactive">
+                        <i className="fa-solid fa-power-off"></i>
+                        <h3>{inactiveSensor}</h3>
+                        <p>Inaktiva sensorer</p>
+                    </div>
                 </div>
             </div>
+            )}
         </div>
+        
+        
     )
 }
 

@@ -72,6 +72,13 @@
     padding: 0.3rem;
 }
 
+.Sensor-list-offline {
+    font-size: 1.5rem;
+    font-family: "Hermeneus One";
+    font-weight: 600;
+    color: #f36868;
+}
+
 @media (max-width: 600px)
 {
     .Sensor-container {
