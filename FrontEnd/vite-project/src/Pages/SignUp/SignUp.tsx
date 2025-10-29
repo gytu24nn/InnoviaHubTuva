@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { registerUser, signIn } from '../../Services/authService'
 import "../SignIn/Signin.css"
+import { useUser } from '../../Context/UserContext'
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { refreshUser } = useUser();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -24,6 +26,7 @@ const SignUp = () => {
       setLoading(true);
       await registerUser(username.trim(), password);
       await signIn(username.trim(), password);
+      await refreshUser();
       navigate('/Home');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
