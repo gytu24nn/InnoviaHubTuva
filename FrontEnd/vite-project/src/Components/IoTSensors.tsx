@@ -3,6 +3,8 @@ import * as signalR from "@microsoft/signalr";
 import "./IotSensors.css";
 import "../ErrorAndLoading.css";
 
+const IOT_SERVER_OFFLINE_ERROR = "IOT_SERVER_OFFLINE";
+
 interface Device {
     id: string;
     tenantId: string;
@@ -26,8 +28,6 @@ const IotSensors = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Kanske kolla om användaren är inloggad beror på vad den placeras.
-
         const fetchIoTSensors = async () => {
             try {
                 //Loading state medans sensor info hämtas
@@ -56,7 +56,14 @@ const IotSensors = () => {
                 setDevices(data);
             } catch (err) {
                 console.error("Error fetching tenants or tenants devices.", err);
-                setError(err instanceof Error ? err.message : "Ett oväntat fel uppstod vid hämtning av sensorer.");
+
+                if(err instanceof TypeError && err.message.includes('Failed to fetch')) {
+                    setError(IOT_SERVER_OFFLINE_ERROR);
+                } else if (err instanceof Error) {
+                    setError(err.message)
+                } else {
+                    setError("Ett oväntat fel uppstod vid hämtning av sensorer");
+                }
             } finally {
                 setLoading(false);
             }
@@ -98,63 +105,76 @@ const IotSensors = () => {
 
 
     if(loading) return <p className="loading-message">Laddar sensorer...</p>
-    if (error) return <p className="error-message">{error}</p>;
 
     return (
         <div className="Sensor-container">
             <h2 className="Sensor-Title">Sensorer:</h2>
-            <ul className="Sensor-list">
-                {devices.map(device => {
-                    const measurement = latestMeasurements[device.id]; // Hämtar senaste mätning för den här enheten
-                    let displayValue = "-";
 
-                    if(measurement) {
-                        if(measurement.unit === "detections" || measurement.unit === "motions")
-                        {
-                            displayValue = measurement.value > 0.5 ? "Detected" : "Undetected"
-                        } else if (measurement.unit === "Waterleak") {
-                            displayValue = measurement.value > 0.5 ? "Yes" : "No"
+            {error ? (
+                error === IOT_SERVER_OFFLINE_ERROR ? (
+                    <p className="Sensor-list-offline">Kontorets sensorer är offline. Kontakta admin!</p>
+                ) : (
+                    <p className="error-message">{error}</p>
+                )
+            ): (
+                <ul className="Sensor-list">
+                    {devices.map(device => {
+                        const measurement = latestMeasurements[device.id]; // Hämtar senaste mätning för den här enheten
+                        let displayValue = "-";
+
+                        if(measurement) {
+                            if(measurement.unit === "detections" || measurement.unit === "motions")
+                            {
+                                displayValue = measurement.value > 0.5 ? "Detected" : "Undetected"
+                            } else if (measurement.unit === "Waterleak") {
+                                displayValue = measurement.value > 0.5 ? "Yes" : "No"
+                            }
+                            else if (typeof measurement.value === "number") {
+                                displayValue = measurement.value.toFixed(2)
+                            } 
+                            else {
+                                displayValue = String(measurement.value)
+                            }
                         }
-                        else if (typeof measurement.value === "number") {
-                            displayValue = measurement.value.toFixed(2)
-                        } 
-                        else {
-                            displayValue = String(measurement.value)
-                        }
-                    }
 
 
-                    return (
-                        <li key={device.id} className={`Sensor-list-item ${latestMeasurements[device.id] ? "updated" : ""}`}>
-                            <strong className="Sensor-list-item-Title">
-                                {device.model}: 
-                                <span className={device.status.toLowerCase() === "active" ? "Sensor-status-online" : "Sensor-status-offline"}>
-                                    ({device.status})
-                                </span>
-                            </strong>
+                        return (
+                            <li key={device.id} className={`Sensor-list-item ${latestMeasurements[device.id] ? "updated" : ""}`}>
+                                <strong className="Sensor-list-item-Title">
+                                    {device.model}: 
+                                    <span className={device.status.toLowerCase() === "active" ? "Sensor-status-online" : "Sensor-status-offline"}>
+                                        ({device.status})
+                                    </span>
+                                </strong>
 
-                            <div className="Sensor-list-item-measurements">
-                                {measurement ? (
-                                    <>
-                                        <p className={
-                                            displayValue === "Detected" ? "value-green" 
-                                            : displayValue === "Undetected" ? "value-red"
-                                            : displayValue === "Yes" ? "value-red"
-                                            : displayValue === "No" ? "value-green"
-                                            : "measurements-info"
-                                        }>
-                                            {displayValue} <i>{measurement.unit === "detections" || measurement.unit === "Waterleak" || measurement.unit === "motions" ? "" : measurement.unit}</i>
-                                        </p> 
-                                        
-                                    </>
-                                ) : (
-                                    "Inga mätningar ännu"
-                                )}
-                            </div>
-                        </li>
-                    );
-                })}
-            </ul>
+                                <div className="Sensor-list-item-measurements">
+                                    {measurement ? (
+                                        <>
+                                            <p className={
+                                                displayValue === "Detected" ? "value-green" 
+                                                : displayValue === "Undetected" ? "value-red"
+                                                : displayValue === "Yes" ? "value-red"
+                                                : displayValue === "No" ? "value-green"
+                                                : "measurements-info"
+                                            }>
+                                                {displayValue} <i>{measurement.unit === "detections" || measurement.unit === "Waterleak" || measurement.unit === "motions" ? "" : measurement.unit}</i>
+                                            </p> 
+                                            
+                                        </>
+                                    ) : (
+                                        "Inga mätningar ännu"
+                                    )}
+                                </div>
+                            </li>
+                        );
+                    })}
+                    {devices.length === 0 && !loading && !error && (
+                        <li className="Sensor-list-item">Inga enheter registrerade för denna tenant.</li>
+                    )}
+                </ul>
+            )}
+
+            
         </div>
     )
 }
