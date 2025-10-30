@@ -91,10 +91,10 @@ InnoviaHub is developed by:
 **Group:** Hub4
 
 **Group members:**
-- Tuva Gyllensten
-- Christoffer Kjellgren
-- Linus Hallerström
-- Villiam Damström
+- [Tuva Gyllensten](https://github.com/gytu24nn)
+- [Christoffer Kjellgren](https://github.com/Kittzor)
+- [Linus Hallerström](https://github.com/hallerstrom)
+- [Villiam Damström](https://github.com/VilliamDamstrom)
 
 ## ✨ Individual Core Development (Tuva Gyllensten)
 The following functionality was developed and implemented individually by me, **Tuva Gyllensten**:
