@@ -23,17 +23,26 @@ dotnet restore
 dotnet ef database update
 ```
 
-4. **Create a `.env` file in the backend folder to enable AI functionality:**
+4. **Create a `.env` file in the backend folder root to enable AI functionality:**
 
-Add following line in the `.env` file and replace it with your OPENAI API-key: 
-```env
-OPENAI_API_KEY="YOURE_OPENAI_API_KEY"
-```
+    #### OPEN_AI_KEY:
+1. Go to [OpenAI’s API Keys page](https://platform.openai.com/account/api-keys).
+(You need an OpenAI account to access this page.)
+
+2. Click on “Create new secret key” and copy the generated key.
+    >⚠️ You will only see the key once — make sure to copy and save it securely.
+
+3. Add following line in the `.env` file and replace it with your OPENAI API-key: 
+    ```env
+    OPENAI_API_KEY="YOURE_OPENAI_API_KEY"
+    ```
+    >⚠️ Never commit your API key to version control. Keep it safe and only share 
+it via environment variables or secret managers.
 
 5. **Run the backend server:**
-```bash
-dotnet watch --urls=http://localhost:5099/
-```
+    ```bash
+    dotnet watch --urls=http://localhost:5099/
+    ```
 
 **The server will start and automatically open Swagger UI at:**
 👉 https://localhost:5001/swagger

@@ -10,15 +10,15 @@ This is the frontend part of this application, built with React, Typescript and 
 
 ### Installation: 
 1. **Navigate to the frontend folder:**
-```bash
-cd frontend
-cd vite-project
-```
+    ```bash
+    cd frontend
+    cd vite-project
+    ```
 
 2. **Install dependencies:**
-```bash
-npm install
-```
+    ```bash
+    npm install
+    ```
 
 3. Start frontend in the frontend folder: 
     **npm run dev:**  → Runs the app in development mode with HMR
@@ -43,45 +43,46 @@ npm install
     Link to IoT repository: https://github.com/gytu24nn/innovia-iot-tuva 
 
     1. **Clone the repo**
-    ```bash 
-    git clone https://github.com/gytu24nn/innovia-iot-tuva.git
-    ```
+        ```bash 
+        git clone https://github.com/gytu24nn/innovia-iot-tuva.git
+        ```
     2. **Start the database**
 
-    To start the database do this command in deploy folder in the terminal. 
+        To start the database do this command in deploy folder in the terminal. 
 
-    ```bash
-    docker-compose up -d
-    ``` 
+        ```bash
+        docker-compose up -d
+        ``` 
 
     3. **Start the different microservices in this order (each command in its own terminal)**
-    ```bash 
-    cd innovia-iot-tuva\src\DeviceRegistry.Api && dotnet run
-    cd innovia-iot-tuva\src\Realtime.Hub && dotnet run 
-    cd innovia-iot-tuva\src\Ingest-Gateway && dotnet run
-    cd innovia-iot-tuva\src\Edge.Simulator && dotnet run
-    ```
+        ```bash 
+        cd innovia-iot-tuva\src\DeviceRegistry.Api && dotnet run
+        cd innovia-iot-tuva\src\Realtime.Hub && dotnet run 
+        cd innovia-iot-tuva\src\Ingest-Gateway && dotnet run
+        cd innovia-iot-tuva\src\Edge.Simulator && dotnet run
+        ```
 
     4. **Add a tenant and devices**
 
-    You need to create your own tenant for innovia and your own devices to be able to se them: 
+        You need to create your own tenant for innovia and your own devices to be able to se them: 
 
-    **First create tenant: Swagger**    
-    This is the endpoint for create tenant:                             
-    POST http://localhost:5101/api/tenants
+        **First create tenant: Swagger**    
+        This is the endpoint for create tenant:                             
+        POST http://localhost:5101/api/tenants
 
-    When you create a tenant you need to fill in name: Innovia Hub and slug: innovia
+        When you create a tenant you need to fill in name: Innovia Hub and slug: innovia
 
-    **Second create devices for tenant: Swagger**
+        **Second create devices for tenant: Swagger**
 
-    This is the endpoint for create devices for a tenant:           
-    POST http://localhost:5101/api/tenants/<TENANT_ID>/devices
+        This is the endpoint for create devices for a tenant:           
+        POST http://localhost:5101/api/tenants/<TENANT_ID>/devices
 
-    When your create a device you need to fill in this for exampel: 
+        When your create a device you need to fill in this for exampel: 
 
-    { "model":"Acme CO2-Temp", "serial":"dev-101", "status":"active" }
+        { "model":"Acme CO2-Temp", "serial":"dev-101", "status":"active" }
 
-    **if your want to do add more different models you need to add information in the config.json file in Edge.Simulator.**
+        **if your want to do add more different models you need to add information in the config.json file in Edge.Simulator.**
+    
 
 ## 📖 Related Documentation
 - **Backend:** [Backend guide](./BackEnd/README.md)
