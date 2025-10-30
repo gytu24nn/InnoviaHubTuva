@@ -66,12 +66,16 @@ npm install
 npm run dev
 ```
 
+**Open frontend [http://localhost:5173/](http://localhost:5173/)**
+
 **Backend:** [Backend guide](./BackEnd/README.md)
 ```bash
 cd BackEnd
 dotnet restore
 dotnet run
 ```
+
+**Open backend [https://localhost:5001/swagger](https://localhost:5001/swagger)**
 
 ## 🛠️ Tech Stack
 - **Frontend:** React, TypeScript, Vite, CSS/styling, SignalR, IoT-sensors

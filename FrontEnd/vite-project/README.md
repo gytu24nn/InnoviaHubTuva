@@ -82,7 +82,9 @@ This is the frontend part of this application, built with React, Typescript and 
         { "model":"Acme CO2-Temp", "serial":"dev-101", "status":"active" }
 
         **if your want to do add more different models you need to add information in the config.json file in Edge.Simulator.**
-    
+
+
+**Open frontend [http://localhost:5173/](http://localhost:5173/)**    
 
 ## 📖 Related Documentation
 - **Backend:** [Backend guide](./BackEnd/README.md)
